@@ -1,5 +1,7 @@
 import io
 
+from lark import ParseTree
 
-def format(file_obj: io.TextIOBase, output_file: io.TextIOBase):
+
+def format(tree: ParseTree, output_file: io.TextIOBase):
     pass
