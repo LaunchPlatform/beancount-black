@@ -16,7 +16,7 @@ def main(filename: typing.List[str]):
     for name in filename:
         logger.info("Processing file %s", name)
         with open(name, "rt") as input_file:
-            tree = parser.parse(input_file)
+            tree = parser.parse(input_file.read())
         with tempfile.NamedTemporaryFile(mode="wt", suffix=".bean") as output_file:
             format(tree, output_file)
         # TODO: swap the file and remove old file
