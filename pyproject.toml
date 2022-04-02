@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "beancount-black"
+version = "0.1.0"
+description = "Just like Python's black code formatter, but for Beancount instead"
+authors = ["Fang-Pen Lin <fangpen@launchplatform.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+beancount-parser = "^0.1.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
