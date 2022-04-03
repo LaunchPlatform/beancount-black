@@ -1,11 +1,15 @@
 import io
 import logging
+import re
 import typing
 
 from lark import ParseTree
 from lark import Token
 from lark import Tree
 from lark.visitors import Visitor
+
+
+COMMENT_PREFIX = re.compile("[;*]+")
 
 
 class BeancountCollector(Visitor):
@@ -45,8 +49,13 @@ class BeancountCollector(Visitor):
 
 
 def format_comment(token: Token) -> str:
-    # TODO: ensure the leading space after ';'
-    return token.value.strip()
+    value = token.value.strip()
+    match = COMMENT_PREFIX.match(value)
+    prefix = match.group(0)
+    remain = value[len(prefix) :].strip()
+    if not remain:
+        return prefix
+    return f"{prefix} {remain}"
 
 
 def format(tree: ParseTree, output_file: io.TextIOBase):
