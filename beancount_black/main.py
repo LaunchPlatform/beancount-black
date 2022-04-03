@@ -17,13 +17,13 @@ def create_backup(src: pathlib.Path, suffix: str) -> pathlib.Path:
     :param suffix: suffix of backup file
     :return: the path of backup file
     """
-    conflict_number = 0
+    conflicts = 0
     while True:
         backup_path: pathlib.Path = src.with_name(src.name + suffix)
-        if conflict_number > 0:
-            backup_path += f".{conflict_number}"
+        if conflicts > 0:
+            backup_path = backup_path.with_name(f"{backup_path.name}.{conflicts}")
         if backup_path.exists():
-            conflict_number += 1
+            conflicts += 1
             continue
         shutil.copy2(src, backup_path)
         return backup_path

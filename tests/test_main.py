@@ -4,7 +4,29 @@ import shutil
 import pytest
 from click.testing import CliRunner
 
+from beancount_black.main import create_backup
 from beancount_black.main import main
+
+
+def test_create_backup(tmp_path: pathlib.Path):
+    content = "; my book\n; foobar"
+    input_file = tmp_path / "input.bean"
+    input_file.write_text(content)
+    create_backup(input_file, suffix=".backup")
+    backup_file = tmp_path / "input.bean.backup"
+    assert backup_file.read_text() == content
+
+
+def test_create_backup_with_conflicts(tmp_path: pathlib.Path):
+    for i in range(5):
+        input_file = tmp_path / "input.bean"
+        input_file.write_text(str(i))
+        create_backup(input_file, suffix=".backup")
+    backup_file = tmp_path / "input.bean.backup"
+    assert backup_file.read_text() == "0"
+    for i in range(1, 4):
+        backup_file = tmp_path / f"input.bean.backup.{i}"
+        assert backup_file.read_text() == str(i)
 
 
 @pytest.mark.parametrize(
