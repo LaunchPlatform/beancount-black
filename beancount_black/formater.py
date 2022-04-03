@@ -34,6 +34,16 @@ class EntryType(enum.Enum):
     COMMENTS = "COMMENTS"
 
 
+# The entries which are going to be listed in groups before all other entries
+LEADING_ENTRY_TYPES: typing.List[EntryType] = [
+    EntryType.INCLUDE,
+    EntryType.OPTION,
+    EntryType.PLUGIN,
+    EntryType.COMMODITY,
+    EntryType.OPEN,
+    EntryType.CLOSE,
+]
+
 DATE_DIRECTIVE_ENTRY_TYPES = {
     "open": EntryType.OPEN,
     "close": EntryType.CLOSE,
@@ -137,6 +147,43 @@ def format_comment(token: Token) -> str:
     return f"{prefix} {remain}"
 
 
+def format_directive_child(child: typing.Union[Token, Tree]) -> str:
+    if isinstance(child, Token):
+        # TODO: some token may need reformat?
+        return child.value
+    tree: Tree = child
+    if tree.data == "currencies":
+        return ",".join(currency.value for currency in tree.children)
+    raise ValueError(f"Unknown tree type {tree.data}")
+
+
+def format_date_directive(tree: Tree) -> str:
+    if tree.data != "date_directive":
+        raise ValueError("Expected a date directive")
+    first_child = tree.children[0]
+    if first_child.data == "txn":
+        return ""
+    else:
+        date = format_directive_child(first_child.children[0])
+        items: typing.List[str] = [date, first_child.data]
+        items.extend(
+            map(
+                format_directive_child,
+                filter(lambda child: child is not None, first_child.children[1:]),
+            )
+        )
+        return " ".join(items)
+
+
+def format_entry(entry: Entry) -> str:
+    lines = []
+    for comment in entry.comments:
+        lines.append(format_comment(comment))
+    if entry.type != EntryType.COMMENTS:
+        pass
+    return "\n".join(lines)
+
+
 def format_statement_group(group: StatementGroup) -> str:
     lines: typing.List[str] = []
     if group.header is not None:
@@ -191,9 +238,40 @@ def format_statement_group(group: StatementGroup) -> str:
             )
             entries.append(entry)
 
-    entry_groups = collections.defaultdict(list)
+    if comments:
+        entry = Entry(
+            type=EntryType.COMMENTS,
+            comments=comments,
+            statement=statement,
+            metadata=[],
+            postings=[],
+        )
+        entries.append(entry)
+        # TODO: or add to tail comments?
+
+    # breaking down entries into groups by leading entry type, comments or
+    # None (means doesn't belong to the leading groups or comments)
+    entry_groups: typing.Dict[
+        typing.Optional[EntryType], typing.List[Entry]
+    ] = collections.defaultdict(list)
     for entry in entries:
+        entry_type: typing.Optional[EntryType] = None
+        if entry.type in LEADING_ENTRY_TYPES or entry_type == EntryType.COMMENTS:
+            entry_type = entry.type
+        entry_groups[entry_type].append(entry)
+
+    for comment_group in comments:
+        # TODO: output comment group
         pass
+
+    for entry_type in LEADING_ENTRY_TYPES:
+        entry_group = entry_groups.get(entry_type, [])
+        # TODO: sort entry group
+        for entry in entry_group:
+            pass
+        if entry_group:
+            lines.append("")
+
     print(entries)
     return "\n".join(lines)
 
@@ -209,3 +287,10 @@ def format_beancount(tree: ParseTree, output_file: io.TextIOBase):
         output_file.write(format_comment(header_comment) + "\n")
     if collector.header_comments and collector.statement_groups:
         output_file.write("\n")
+
+    try:
+        for group in collector.statement_groups:
+            output_file.write(format_statement_group(group) + "\n")
+    except Exception as e:
+        print()
+        pass
