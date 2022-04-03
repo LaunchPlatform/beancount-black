@@ -58,7 +58,7 @@ def format_comment(token: Token) -> str:
     return f"{prefix} {remain}"
 
 
-def format(tree: ParseTree, output_file: io.TextIOBase):
+def format_beancount(tree: ParseTree, output_file: io.TextIOBase):
     if tree.data != "start":
         raise ValueError("expected start as the root rule")
     collector = BeancountCollector()
@@ -67,5 +67,5 @@ def format(tree: ParseTree, output_file: io.TextIOBase):
     # write header comments
     for header_comment in collector.header_comments:
         output_file.write(format_comment(header_comment) + "\n")
-    if collector.header_comments:
+    if collector.header_comments and collector.statements:
         output_file.write("\n")

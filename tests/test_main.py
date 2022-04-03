@@ -11,6 +11,7 @@ from beancount_black.main import main
     "input_file, expected_output_file",
     [
         ("simple.bean", "simple.bean"),
+        ("header_comments.bean", "header_comments.bean"),
     ],
 )
 def test_main(
