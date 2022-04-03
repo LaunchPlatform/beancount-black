@@ -57,7 +57,6 @@ def format(tree: ParseTree, output_file: io.TextIOBase):
 
     # write header comments
     for header_comment in collector.header_comments:
-        # TODO: format comment, ensure leading space
-        print(format_comment(header_comment), file=output_file)
-    if collector.header_comments():
-        print(file=output_file)
+        output_file.write(format_comment(header_comment) + "\n")
+    if collector.header_comments:
+        output_file.write("\n")

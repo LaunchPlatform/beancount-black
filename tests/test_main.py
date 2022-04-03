@@ -26,4 +26,6 @@ def test_main(
     runner = CliRunner()
     result = runner.invoke(main, [str(tmp_input_file)])
     assert result.exit_code == 0
-    assert result.output == ""
+    updated_input_content = tmp_input_file.read_text()
+    expected_output_content = expected_output_file_path.read_text()
+    assert updated_input_content == expected_output_content

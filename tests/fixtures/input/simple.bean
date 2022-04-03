@@ -1,4 +1,4 @@
-;; -*- mode: org; mode: beancount; -*-
+;;-*- mode: org; mode: beancount; -*-
 ;; this is my personal book
 1970-01-01 open Assets:Bank USD; comment for Assets:Bank
 
