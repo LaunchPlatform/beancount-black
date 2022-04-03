@@ -44,9 +44,7 @@ def main(filename: typing.List[click.Path], backup_suffix: str, no_backup: bool)
         with open(name, "rt") as input_file:
             input_content = input_file.read()
             tree = parser.parse(input_content)
-        with tempfile.NamedTemporaryFile(
-            mode="wt+", suffix=".bean", delete=False
-        ) as output_file:
+        with tempfile.NamedTemporaryFile(mode="wt+", suffix=".bean") as output_file:
             format(tree, output_file)
             output_file.seek(0)
             output_content = output_file.read()
