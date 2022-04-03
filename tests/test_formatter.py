@@ -35,9 +35,21 @@ def test_format_comment(value: str, expected_result: str):
     "text, expected_result",
     [
         (
+            "1970-01-01  open     Assets:Bank",
+            "1970-01-01 open Assets:Bank",
+        ),
+        (
+            "1970-01-01  open     Assets:Bank   USD",
+            "1970-01-01 open Assets:Bank USD",
+        ),
+        (
             "1970-01-01  open     Assets:Bank   USD,BTC",
             "1970-01-01 open Assets:Bank USD,BTC",
-        )
+        ),
+        (
+            '1970-01-01  open     Assets:Bank   USD,BTC  "strict" ',
+            '1970-01-01 open Assets:Bank USD,BTC "strict"',
+        ),
     ],
 )
 def test_format_date_directive(text: str, expected_result: str):
