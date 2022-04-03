@@ -12,13 +12,18 @@ from lark.visitors import Visitor
 COMMENT_PREFIX = re.compile("[;*]+")
 
 
+class StatementGroup(typing.NamedTuple):
+    header: typing.Optional[Token]
+    statements: typing.List[Tree]
+
+
 class BeancountCollector(Visitor):
     def __init__(self, logger=None):
         super().__init__()
         self.logger = logger or logging.getLogger(__name__)
         # Collection of the header comments
         self.header_comments: typing.List[Token] = []
-        self.statements: typing.List[Tree] = []
+        self.statement_groups: typing.List[StatementGroup] = []
 
     def start(self, tree: Tree):
         for child in tree.children:
@@ -33,17 +38,21 @@ class BeancountCollector(Visitor):
             else:
                 raise ValueError("Unexpected token type %s", first_child.type)
         else:
-            self.statements.append(tree)
+            if not self.statement_groups:
+                self.statement_groups.append(StatementGroup(header=None, statements=[]))
+            self.statement_groups[-1].statements.append(tree)
 
     def comment_token(self, token: Token):
         value = token.value.strip()
         if value.startswith("*"):
-            # We simply ignore star comments for now
-            self.logger.warning("Ignore star comments at line %s", token.line)
+            self.logger.debug(
+                "New statement group for %r at line %s", token.value, token.line
+            )
+            self.statement_groups.append(StatementGroup(header=token, statements=[]))
             return
         if token.line != len(self.header_comments) + 1:
             return
-        if not self.statements:
+        if not self.statement_groups:
             self.logger.debug("Collect header comment %s at line %s", token, token.line)
             self.header_comments.append(token)
 
@@ -67,5 +76,5 @@ def format_beancount(tree: ParseTree, output_file: io.TextIOBase):
     # write header comments
     for header_comment in collector.header_comments:
         output_file.write(format_comment(header_comment) + "\n")
-    if collector.header_comments and collector.statements:
+    if collector.header_comments and collector.statement_groups:
         output_file.write("\n")
