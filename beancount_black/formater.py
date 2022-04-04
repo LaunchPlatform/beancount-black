@@ -135,17 +135,17 @@ class BeancountCollector:
         if isinstance(first_child, Token):
             # Comment only line
             if first_child.type == "COMMENT":
-                self.comment_token(first_child)
+                if self.comment_token(first_child):
+                    # already added as part of the header comments, just return
+                    return
             elif first_child.type == "ORG_ANCHOR":
                 self.org_anchor_token(first_child)
+                return
             else:
                 raise ValueError("Unexpected token type %s", first_child.type)
-        else:
-            if not self.statement_groups:
-                self.statement_groups.append(
-                    StatementGroup(org_anchor=None, statements=[])
-                )
-            self.statement_groups[-1].statements.append(tree)
+        if not self.statement_groups:
+            self.statement_groups.append(StatementGroup(org_anchor=None, statements=[]))
+        self.statement_groups[-1].statements.append(tree)
 
     def org_anchor_token(self, token: Token):
         self.logger.debug(
@@ -153,12 +153,14 @@ class BeancountCollector:
         )
         self.statement_groups.append(StatementGroup(org_anchor=token, statements=[]))
 
-    def comment_token(self, token: Token):
+    def comment_token(self, token: Token) -> bool:
         if token.line != len(self.header_comments) + 1:
-            return
-        if not self.statement_groups:
-            self.logger.debug("Collect header comment %s at line %s", token, token.line)
-            self.header_comments.append(token)
+            return False
+        if self.statement_groups:
+            return False
+        self.logger.debug("Collect header comment %s at line %s", token, token.line)
+        self.header_comments.append(token)
+        return True
 
 
 def format_comment(token: Token) -> str:
@@ -354,7 +356,7 @@ def format_statement_group(group: StatementGroup) -> str:
         first_child = statement.children[0]
         if isinstance(first_child, Token):
             if first_child.type == "COMMENT":
-                comments.append(statement)
+                comments.append(first_child)
             else:
                 raise ValueError(f"Unexpected token {first_child.type}")
         else:
@@ -376,6 +378,7 @@ def format_statement_group(group: StatementGroup) -> str:
                 last_entry.postings.append(
                     Posting(comments=comments, statement=statement, metadata=[])
                 )
+                comments = []
                 continue
             elif first_child.data == "metadata_item":
                 last_entry = entries[-1]
@@ -385,6 +388,7 @@ def format_statement_group(group: StatementGroup) -> str:
                     last_posting.metadata.append(metadata)
                 else:
                     last_entry.metadata.append(metadata)
+                comments = []
                 continue
             entry = Entry(
                 type=get_entry_type(statement),
@@ -394,6 +398,7 @@ def format_statement_group(group: StatementGroup) -> str:
                 postings=[],
             )
             entries.append(entry)
+            comments = []
 
     if comments:
         entry = Entry(
@@ -440,7 +445,6 @@ def format_statement_group(group: StatementGroup) -> str:
     if remain_entries:
         lines.append("")
 
-    print(entries)
     return "\n".join(lines)
 
 
