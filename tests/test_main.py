@@ -47,7 +47,7 @@ def test_main(
     tmp_input_file = tmp_path / "input.bean"
     shutil.copy2(input_file_path, tmp_input_file)
     runner = CliRunner()
-    result = runner.invoke(main, [str(tmp_input_file)])
+    result = runner.invoke(main, [str(tmp_input_file)], catch_exceptions=False)
     assert result.exit_code == 0
     updated_input_content = tmp_input_file.read_text()
     expected_output_content = expected_output_file_path.read_text()

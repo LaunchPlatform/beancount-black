@@ -8,7 +8,6 @@ import typing
 from lark import ParseTree
 from lark import Token
 from lark import Tree
-from lark.visitors import Visitor
 
 
 COMMENT_PREFIX = re.compile("[;*]+")
@@ -74,7 +73,7 @@ def get_entry_type(statement: Tree) -> EntryType:
 
 
 class StatementGroup(typing.NamedTuple):
-    header: typing.Optional[Token]
+    org_anchor: typing.Optional[Token]
     statements: typing.List[Tree]
 
 
@@ -97,7 +96,7 @@ class Entry(typing.NamedTuple):
     postings: typing.List[Posting]
 
 
-class BeancountCollector(Visitor):
+class BeancountCollector:
     def __init__(self, logger=None):
         super().__init__()
         self.logger = logger or logging.getLogger(__name__)
@@ -105,31 +104,40 @@ class BeancountCollector(Visitor):
         self.header_comments: typing.List[Token] = []
         self.statement_groups: typing.List[StatementGroup] = []
 
-    def start(self, tree: Tree):
+    def collect(self, tree: Tree):
+        if tree.data != "start":
+            raise ValueError("Expected start")
         for child in tree.children:
-            self.visit_topdown(child)
+            if child is None:
+                continue
+            self.statement(child)
 
     def statement(self, tree: Tree):
+        if tree.data != "statement":
+            raise ValueError("Expected statement")
         first_child = tree.children[0]
         if isinstance(first_child, Token):
             # Comment only line
             if first_child.type == "COMMENT":
                 self.comment_token(first_child)
+            elif first_child.type == "ORG_ANCHOR":
+                self.org_anchor_token(first_child)
             else:
                 raise ValueError("Unexpected token type %s", first_child.type)
         else:
             if not self.statement_groups:
-                self.statement_groups.append(StatementGroup(header=None, statements=[]))
+                self.statement_groups.append(
+                    StatementGroup(org_anchor=None, statements=[])
+                )
             self.statement_groups[-1].statements.append(tree)
 
+    def org_anchor_token(self, token: Token):
+        self.logger.debug(
+            "New statement group for %r at line %s", token.value, token.line
+        )
+        self.statement_groups.append(StatementGroup(org_anchor=token, statements=[]))
+
     def comment_token(self, token: Token):
-        value = token.value.strip()
-        if value.startswith("*"):
-            self.logger.debug(
-                "New statement group for %r at line %s", token.value, token.line
-            )
-            self.statement_groups.append(StatementGroup(header=token, statements=[]))
-            return
         if token.line != len(self.header_comments) + 1:
             return
         if not self.statement_groups:
@@ -174,11 +182,20 @@ def format_date_directive(
     if column_widths is None:
         column_widths = {}
     first_child = tree.children[0]
-    if first_child.data == "txn":
-        return ""
+    date = first_child.children[0].value
+    directive_type = first_child.data.value
+    if directive_type == "txn":
+        columns: typing.List[str] = [date]
+        flag, payee, narration, annotations = first_child.children[1:]
+        if flag is not None:
+            columns.append(flag.value)
+        if payee is not None:
+            columns.append(payee.value)
+        if narration is not None:
+            columns.append(narration.value)
+        # TODO: add annotations
+        return " ".join(columns)
     else:
-        date = first_child.children[0].value
-        directive_type = first_child.data.value
         columns: typing.List[str] = [date, directive_type]
         for child in first_child.children[1:]:
             if child is None:
@@ -200,15 +217,19 @@ def format_entry(entry: Entry) -> str:
     for comment in entry.comments:
         lines.append(format_comment(comment))
     if entry.type != EntryType.COMMENTS:
-        # TODO:
-        pass
+        first_child = entry.statement.children[0]
+        if first_child.data == "date_directive":
+            lines.append(format_date_directive(first_child))
+        else:
+            # TODO:
+            pass
     return "\n".join(lines)
 
 
 def format_statement_group(group: StatementGroup) -> str:
     lines: typing.List[str] = []
-    if group.header is not None:
-        lines.append(format_comment(group.header))
+    if group.org_anchor is not None:
+        lines.append(format_comment(group.org_anchor))
         if group.statements:
             lines.append("")
 
@@ -220,7 +241,7 @@ def format_statement_group(group: StatementGroup) -> str:
             if first_child.type == "COMMENT":
                 comments.append(statement)
             else:
-                raise ValueError(f"Unepxected token {first_child.type}")
+                raise ValueError(f"Unexpected token {first_child.type}")
         else:
             if comments and comments[-1].line != statement.meta.line + 1:
                 # Standalone comment group
@@ -288,10 +309,19 @@ def format_statement_group(group: StatementGroup) -> str:
     for entry_type in LEADING_ENTRY_TYPES:
         entry_group = entry_groups.get(entry_type, [])
         # TODO: sort entry group
+        if not entry_group:
+            continue
         for entry in entry_group:
-            pass
-        if entry_group:
-            lines.append("")
+            # TODO: pass along with column width
+            lines.append(format_entry(entry))
+        lines.append("")
+
+    remain_entries = entry_groups.get(None, [])
+    # TODO: sort remain entries
+    for entry in remain_entries:
+        lines.append(format_entry(entry))
+    if remain_entries:
+        lines.append("")
 
     print(entries)
     return "\n".join(lines)
@@ -301,7 +331,7 @@ def format_beancount(tree: ParseTree, output_file: io.TextIOBase):
     if tree.data != "start":
         raise ValueError("expected start as the root rule")
     collector = BeancountCollector()
-    collector.visit_topdown(tree)
+    collector.collect(tree)
 
     # write header comments
     for header_comment in collector.header_comments:
@@ -309,9 +339,5 @@ def format_beancount(tree: ParseTree, output_file: io.TextIOBase):
     if collector.header_comments and collector.statement_groups:
         output_file.write("\n")
 
-    try:
-        for group in collector.statement_groups:
-            output_file.write(format_statement_group(group) + "\n")
-    except Exception as e:
-        print()
-        pass
+    for group in collector.statement_groups:
+        output_file.write(format_statement_group(group) + "\n")
