@@ -193,7 +193,16 @@ def format_date_directive(
             columns.append(payee.value)
         if narration is not None:
             columns.append(narration.value)
-        # TODO: add annotations
+        if annotations is not None:
+            annotation_values = [
+                annotation.value for annotation in annotations.children
+            ]
+            links = list(filter(lambda v: v.startswith("^"), annotation_values))
+            links.sort()
+            hashes = list(filter(lambda v: v.startswith("#"), annotation_values))
+            hashes.sort()
+            columns.extend(links)
+            columns.extend(hashes)
         return " ".join(columns)
     else:
         columns: typing.List[str] = [date, directive_type]
