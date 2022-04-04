@@ -173,6 +173,13 @@ def get_directive_child_columns(child: typing.Union[Token, Tree]) -> typing.List
     raise ValueError(f"Unknown tree type {tree.data}")
 
 
+def format_metadata_item(tree: Tree) -> str:
+    if tree.data != "metadata_item":
+        raise ValueError("Expected a metadata item")
+    key_token, value_token = tree.children
+    return f"{key_token.value}: {value_token.value}"
+
+
 def format_date_directive(
     tree: Tree,
     column_widths: typing.Optional[typing.Dict[str, typing.Dict[int, str]]] = None,
@@ -225,6 +232,7 @@ def format_entry(entry: Entry) -> str:
     lines = []
     for comment in entry.comments:
         lines.append(format_comment(comment))
+
     if entry.type != EntryType.COMMENTS:
         first_child = entry.statement.children[0]
         if first_child.data == "date_directive":
@@ -233,6 +241,12 @@ def format_entry(entry: Entry) -> str:
             if tail_comment is not None:
                 line += " " + format_comment(tail_comment)
             lines.append(line)
+            for metadata in entry.metadata:
+                line = format_metadata_item(metadata.statement.children[0])
+                tail_comment = metadata.statement.children[1]
+                if tail_comment is not None:
+                    line += " " + format_comment(tail_comment)
+                lines.append(line)
         else:
             # TODO:
             pass
