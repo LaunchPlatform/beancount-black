@@ -404,11 +404,13 @@ def format_statement_group(group: StatementGroup) -> str:
         entry = Entry(
             type=EntryType.COMMENTS,
             comments=comments,
+            # TODO: maybe pass None makes more sense here?
             statement=statement,
             metadata=[],
             postings=[],
         )
         entries.append(entry)
+        comments = []
         # TODO: or add to tail comments?
 
     # breaking down entries into groups by leading entry type, comments or
@@ -428,7 +430,6 @@ def format_statement_group(group: StatementGroup) -> str:
 
     for entry_type in LEADING_ENTRY_TYPES:
         entry_group = entry_groups.get(entry_type, [])
-        # TODO: sort entry group
         if not entry_group:
             continue
         entry_group.sort(key=get_entry_sorting_key)
