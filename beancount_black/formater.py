@@ -167,7 +167,7 @@ def get_directive_child_columns(child: typing.Union[Token, Tree]) -> typing.List
 
 def format_date_directive(
     tree: Tree,
-    column_widths: typing.Optional[typing.Dict[str, typing.Dict[int, int]]] = None,
+    column_widths: typing.Optional[typing.Dict[str, typing.Dict[int, str]]] = None,
 ) -> str:
     if tree.data != "date_directive":
         raise ValueError("Expected a date directive")
@@ -200,6 +200,7 @@ def format_entry(entry: Entry) -> str:
     for comment in entry.comments:
         lines.append(format_comment(comment))
     if entry.type != EntryType.COMMENTS:
+        # TODO:
         pass
     return "\n".join(lines)
 

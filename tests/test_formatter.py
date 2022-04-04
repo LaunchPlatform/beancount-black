@@ -62,9 +62,9 @@ def test_format_comment(value: str, expected_result: str):
             "1970-01-01 close Assets:Bank",
         ),
         (
-            dict(balance={2: 20}),
+            dict(balance={2: "20", 3: ">10"}),
             "1970-01-01  balance     Assets:Bank  12.34    USD",
-            "1970-01-01 balance Assets:Bank          12.34 USD",
+            "1970-01-01 balance Assets:Bank               12.34 USD",
         ),
     ],
 )
