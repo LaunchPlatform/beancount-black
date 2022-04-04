@@ -147,32 +147,52 @@ def format_comment(token: Token) -> str:
     return f"{prefix} {remain}"
 
 
-def format_directive_child(child: typing.Union[Token, Tree]) -> str:
+def format_number(token: Token) -> str:
+    # TODO: format number
+    return token.value
+
+
+def get_directive_child_columns(child: typing.Union[Token, Tree]) -> typing.List[str]:
     if isinstance(child, Token):
         # TODO: some token may need reformat?
-        return child.value
+        return [child.value]
     tree: Tree = child
     if tree.data == "currencies":
-        return ",".join(currency.value for currency in tree.children)
+        return [",".join(currency.value for currency in tree.children)]
+    elif tree.data == "amount":
+        number, currency = tree.children
+        return [format_number(number), currency.value]
     raise ValueError(f"Unknown tree type {tree.data}")
 
 
-def format_date_directive(tree: Tree) -> str:
+def format_date_directive(
+    tree: Tree,
+    column_widths: typing.Optional[typing.Dict[str, typing.Dict[int, int]]] = None,
+) -> str:
     if tree.data != "date_directive":
         raise ValueError("Expected a date directive")
+    if column_widths is None:
+        column_widths = {}
     first_child = tree.children[0]
     if first_child.data == "txn":
         return ""
     else:
-        date = format_directive_child(first_child.children[0])
-        items: typing.List[str] = [date, first_child.data]
-        items.extend(
-            map(
-                format_directive_child,
-                filter(lambda child: child is not None, first_child.children[1:]),
-            )
-        )
-        return " ".join(items)
+        date = first_child.children[0].value
+        directive_type = first_child.data.value
+        columns: typing.List[str] = [date, directive_type]
+        for child in first_child.children[1:]:
+            if child is None:
+                continue
+            columns.extend(get_directive_child_columns(child))
+        directive_column_width = column_widths.get(directive_type)
+        if directive_column_width is not None:
+            for index, column in enumerate(columns):
+                width = directive_column_width.get(index)
+                if width is None:
+                    continue
+                new_value = f"{column:{width}}"
+                columns[index] = new_value
+        return " ".join(columns)
 
 
 def format_entry(entry: Entry) -> str:
