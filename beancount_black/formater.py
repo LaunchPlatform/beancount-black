@@ -344,11 +344,9 @@ def format_entry(entry: Entry, indent_width: int = 2) -> str:
 
 
 def format_statement_group(group: StatementGroup) -> str:
-    lines: typing.List[str] = []
+    sections: typing.List[str] = []
     if group.org_anchor is not None:
-        lines.append(format_comment(group.org_anchor))
-        if group.statements:
-            lines.append("")
+        sections.append(format_comment(group.org_anchor))
 
     entries: typing.List[Entry] = []
     comments: typing.List[Token] = []
@@ -360,7 +358,7 @@ def format_statement_group(group: StatementGroup) -> str:
             else:
                 raise ValueError(f"Unexpected token {first_child.type}")
         else:
-            if comments and comments[-1].line != statement.meta.line + 1:
+            if comments and comments[-1].line + 1 != statement.meta.line:
                 # Standalone comment group
                 entry = Entry(
                     type=EntryType.COMMENTS,
@@ -429,6 +427,7 @@ def format_statement_group(group: StatementGroup) -> str:
         pass
 
     for entry_type in LEADING_ENTRY_TYPES:
+        lines: typing.List[str] = []
         entry_group = entry_groups.get(entry_type, [])
         if not entry_group:
             continue
@@ -436,17 +435,15 @@ def format_statement_group(group: StatementGroup) -> str:
         for entry in entry_group:
             # TODO: pass along with column width
             lines.append(format_entry(entry))
-        lines.append("")
+        if lines:
+            sections.append("\n".join(lines))
 
     remain_entries = entry_groups.get(None, [])
     remain_entries.sort(key=get_entry_sorting_key)
-    # TODO: sort remain entries
     for entry in remain_entries:
-        lines.append(format_entry(entry))
-    if remain_entries:
-        lines.append("")
+        sections.append(format_entry(entry))
 
-    return "\n".join(lines)
+    return "\n\n".join(sections)
 
 
 def format_beancount(tree: ParseTree, output_file: io.TextIOBase):
@@ -456,10 +453,17 @@ def format_beancount(tree: ParseTree, output_file: io.TextIOBase):
     collector.collect(tree)
 
     # write header comments
-    for header_comment in collector.header_comments:
-        output_file.write(format_comment(header_comment) + "\n")
-    if collector.header_comments and collector.statement_groups:
-        output_file.write("\n")
+    sections: typing.List[str] = []
+    if collector.header_comments:
+        lines: typing.List[str] = [
+            format_comment(header_comment)
+            for header_comment in collector.header_comments
+        ]
+        sections.append("\n".join(lines))
 
     for group in collector.statement_groups:
-        output_file.write(format_statement_group(group) + "\n")
+        sections.append(format_statement_group(group))
+
+    output_file.write("\n\n".join(sections))
+    if sections:
+        output_file.write("\n")
