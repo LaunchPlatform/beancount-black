@@ -1,0 +1,53 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine.
+# See: https://circleci.com/docs/2.0/configuration-reference
+version: 2.1
+
+orbs:
+  python: circleci/python@1.5.0
+
+jobs:
+  test:
+    docker:
+      - image: cimg/python:3.10.2
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: poetry
+      - run:
+          name: Run test
+          command: poetry run python -m pytest ./tests -svvvv
+  build-and-publish:
+    docker:
+      - image: cimg/python:3.10.2
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: poetry
+      - run:
+          name: config
+          command: |
+            poetry config http-basic.pypi "__token__" "${POETRY_PYPI_TOKEN_PYPI}"
+      - run:
+          name: Build
+          command: poetry build
+      - run:
+          name: Publish
+          command: poetry publish
+
+workflows:
+  test:
+    jobs:
+      - test:
+          filters:
+            # needed for deploy build
+            # ref: https://discuss.circleci.com/t/builds-for-tags-not-triggering/17681/7
+            tags:
+              only: /^.*/
+      - build-and-publish:
+          requires:
+            - test
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^.*/
