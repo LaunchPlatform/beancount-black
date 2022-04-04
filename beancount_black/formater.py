@@ -241,7 +241,7 @@ def format_metadata_lines(metadata_list: typing.List[Metadata]) -> typing.List[s
     return lines
 
 
-def format_entry(entry: Entry) -> str:
+def format_entry(entry: Entry, indent_width: int = 4) -> str:
     lines = []
     for comment in entry.comments:
         lines.append(format_comment(comment))
@@ -255,7 +255,8 @@ def format_entry(entry: Entry) -> str:
                 line += " " + format_comment(tail_comment)
             lines.append(line)
             metadata_lines = format_metadata_lines(entry.metadata)
-            lines.extend(metadata_lines)
+            for metadata_line in metadata_lines:
+                lines.append(" " * indent_width + metadata_line)
         else:
             # TODO:
             pass
