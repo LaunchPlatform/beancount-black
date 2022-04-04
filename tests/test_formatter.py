@@ -6,6 +6,7 @@ from lark import Token
 
 from beancount_black.formater import format_comment
 from beancount_black.formater import format_date_directive
+from beancount_black.formater import format_number
 
 
 @pytest.mark.parametrize(
@@ -31,6 +32,19 @@ from beancount_black.formater import format_date_directive
 def test_format_comment(value: str, expected_result: str):
     token = Token("COMMENT", value=value)
     assert format_comment(token) == expected_result
+
+
+@pytest.mark.parametrize(
+    "value, expected_result",
+    [
+        ("+123.4567", "123.4567"),
+        ("-123.4567", "-123.4567"),
+        ("1234567.90", "1,234,567.90"),
+    ],
+)
+def test_format_number(value: str, expected_result: str):
+    token = Token("SIGNED_NUMBER", value=value)
+    assert format_number(token) == expected_result
 
 
 @pytest.mark.parametrize(

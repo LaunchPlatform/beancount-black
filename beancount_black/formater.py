@@ -1,4 +1,5 @@
 import collections
+import decimal
 import enum
 import io
 import logging
@@ -156,8 +157,10 @@ def format_comment(token: Token) -> str:
 
 
 def format_number(token: Token) -> str:
-    # TODO: format number
-    return token.value
+    value = token.value.replace(",", "")
+    number = decimal.Decimal(value)
+    # TODO: add width option
+    return f"{number:,}"
 
 
 def get_directive_child_columns(child: typing.Union[Token, Tree]) -> typing.List[str]:

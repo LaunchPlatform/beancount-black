@@ -3,6 +3,7 @@
 1970-01-01 open Assets:Cash USD ; comment for Assets:Cash
 
 1970-01-02 open Expenses:Food USD; comment for Expenses:Food
+1970-01-02 open Expenses:ServiceFee  USD
 1970-01-01 open Assets:Bank   USD; comment for Assets:Bank
 
 1970-01-01 commodity USD
@@ -16,5 +17,6 @@
 
 
 2022-04-02 * "Save money into bank" #hash-1 ; comment for save money into bank
-  Assets:Cash -10.0 USD
-    Assets:Bank 10.0 USD
+  Assets:Cash -12345678.0 USD
+    Assets:Bank 10000000.0 USD
+  Expenses:ServiceFee
