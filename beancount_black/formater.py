@@ -1,4 +1,5 @@
 import collections
+import datetime
 import decimal
 import enum
 import io
@@ -95,6 +96,20 @@ class Entry(typing.NamedTuple):
     statement: Tree
     metadata: typing.List[Metadata]
     postings: typing.List[Posting]
+
+
+def parse_date(date_str: str) -> datetime.date:
+    parts = date_str.split("-")
+    return datetime.date(*(map(int, parts)))
+
+
+def get_entry_sorting_key(entry: Entry) -> typing.Tuple:
+    first_child = entry.statement.children[0]
+    if first_child.data == "date_directive":
+        date = parse_date(first_child.children[0].children[0].value)
+        return (date, entry.statement.meta.line)
+    # TODO:
+    raise ValueError()
 
 
 class BeancountCollector:
@@ -257,13 +272,11 @@ def format_posting(
     items: typing.List[str] = []
     if flag is not None:
         items.append(flag.value)
-    # TODO: apply width here
     account_value = account.value
     if amount is not None:
         # only need to apply width when it's not short posting format
         account_value = f"{account_value:{account_width}}"
     items.append(account_value)
-    # TODO: also apply width here
     if amount is not None:
         number, currency = get_amount_columns(amount)
         items.append(f"{number:{number_width}}")
@@ -413,12 +426,14 @@ def format_statement_group(group: StatementGroup) -> str:
         # TODO: sort entry group
         if not entry_group:
             continue
+        entry_group.sort(key=get_entry_sorting_key)
         for entry in entry_group:
             # TODO: pass along with column width
             lines.append(format_entry(entry))
         lines.append("")
 
     remain_entries = entry_groups.get(None, [])
+    remain_entries.sort(key=get_entry_sorting_key)
     # TODO: sort remain entries
     for entry in remain_entries:
         lines.append(format_entry(entry))
