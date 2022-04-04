@@ -258,7 +258,11 @@ def format_posting(
     if flag is not None:
         items.append(flag.value)
     # TODO: apply width here
-    items.append(f"{account.value:{account_width}}")
+    account_value = account.value
+    if amount is not None:
+        # only need to apply width when it's not short posting format
+        account_value = f"{account_value:{account_width}}"
+    items.append(account_value)
     # TODO: also apply width here
     if amount is not None:
         number, currency = get_amount_columns(amount)
