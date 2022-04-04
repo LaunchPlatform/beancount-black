@@ -228,6 +228,38 @@ def format_date_directive(
         return " ".join(columns)
 
 
+def format_amount(tree: Tree) -> str:
+    if tree.data != "amount":
+        raise ValueError("Expected a amount")
+    number, currency = tree.children
+    return " ".join([format_number(number), currency.value])
+
+
+def format_posting(tree: Tree) -> str:
+    if tree.data != "posting":
+        raise ValueError("Expected a posting")
+    # Simple posting
+    flag: Token
+    account: Token
+    amount: typing.Optional[Tree] = None
+    cost: typing.Optional[Tree] = None
+    tx_price: typing.Optional[Tree] = None
+    if tree.children[0].data == "detailed_posting":
+        flag, account, amount, cost, tx_price = tree.children[0].children
+    else:
+        flag, account = tree.children[0].children
+    items: typing.List[str] = []
+    if flag is not None:
+        items.append(flag.value)
+    # TODO: apply width here
+    items.append(account.value)
+    # TODO: also apply width here
+    if amount is not None:
+        items.append(format_amount(amount))
+    # TODO: other parts
+    return " ".join(items)
+
+
 def format_metadata_lines(metadata_list: typing.List[Metadata]) -> typing.List[str]:
     lines: typing.List[str] = []
     for metadata in metadata_list:
@@ -238,6 +270,24 @@ def format_metadata_lines(metadata_list: typing.List[Metadata]) -> typing.List[s
         if tail_comment is not None:
             line += " " + format_comment(tail_comment)
         lines.append(line)
+    return lines
+
+
+def format_posting_lines(
+    postings: typing.List[Posting], indent_width: int = 4
+) -> typing.List[str]:
+    lines: typing.List[str] = []
+    for posting in postings:
+        for comment in posting.comments:
+            lines.append(format_comment(comment))
+        line = format_posting(posting.statement.children[0])
+        tail_comment = posting.statement.children[1]
+        if tail_comment is not None:
+            line += " " + format_comment(tail_comment)
+        lines.append(line)
+        metadata_lines = format_metadata_lines(posting.metadata)
+        for metadata_line in metadata_lines:
+            lines.append(" " * indent_width + metadata_line)
     return lines
 
 
@@ -257,6 +307,9 @@ def format_entry(entry: Entry, indent_width: int = 4) -> str:
             metadata_lines = format_metadata_lines(entry.metadata)
             for metadata_line in metadata_lines:
                 lines.append(" " * indent_width + metadata_line)
+            posting_lines = format_posting_lines(entry.postings)
+            for posting_line in posting_lines:
+                lines.append(" " * indent_width + posting_line)
         else:
             # TODO:
             pass
