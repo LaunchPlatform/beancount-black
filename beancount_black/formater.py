@@ -163,6 +163,13 @@ def format_number(token: Token) -> str:
     return f"{number:,}"
 
 
+def get_amount_columns(tree: Tree) -> typing.List[str]:
+    if tree.data != "amount":
+        raise ValueError("Expected a amount")
+    number, currency = tree.children
+    return [format_number(number), currency.value]
+
+
 def get_directive_child_columns(child: typing.Union[Token, Tree]) -> typing.List[str]:
     if isinstance(child, Token):
         # TODO: some token may need reformat?
@@ -171,8 +178,7 @@ def get_directive_child_columns(child: typing.Union[Token, Tree]) -> typing.List
     if tree.data == "currencies":
         return [",".join(currency.value for currency in tree.children)]
     elif tree.data == "amount":
-        number, currency = tree.children
-        return [format_number(number), currency.value]
+        return get_amount_columns(tree)
     raise ValueError(f"Unknown tree type {tree.data}")
 
 
@@ -231,14 +237,11 @@ def format_date_directive(
         return " ".join(columns)
 
 
-def format_amount(tree: Tree) -> str:
-    if tree.data != "amount":
-        raise ValueError("Expected a amount")
-    number, currency = tree.children
-    return " ".join([format_number(number), currency.value])
-
-
-def format_posting(tree: Tree) -> str:
+def format_posting(
+    tree: Tree,
+    account_width: str = "40",
+    number_width: str = ">16",
+) -> str:
     if tree.data != "posting":
         raise ValueError("Expected a posting")
     # Simple posting
@@ -255,10 +258,12 @@ def format_posting(tree: Tree) -> str:
     if flag is not None:
         items.append(flag.value)
     # TODO: apply width here
-    items.append(account.value)
+    items.append(f"{account.value:{account_width}}")
     # TODO: also apply width here
     if amount is not None:
-        items.append(format_amount(amount))
+        number, currency = get_amount_columns(amount)
+        items.append(f"{number:{number_width}}")
+        items.append(currency)
     # TODO: other parts
     return " ".join(items)
 
@@ -277,7 +282,7 @@ def format_metadata_lines(metadata_list: typing.List[Metadata]) -> typing.List[s
 
 
 def format_posting_lines(
-    postings: typing.List[Posting], indent_width: int = 4
+    postings: typing.List[Posting], indent_width: int = 2
 ) -> typing.List[str]:
     lines: typing.List[str] = []
     for posting in postings:
@@ -294,7 +299,7 @@ def format_posting_lines(
     return lines
 
 
-def format_entry(entry: Entry, indent_width: int = 4) -> str:
+def format_entry(entry: Entry, indent_width: int = 2) -> str:
     lines = []
     for comment in entry.comments:
         lines.append(format_comment(comment))
