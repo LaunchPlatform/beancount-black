@@ -228,7 +228,11 @@ def format_entry(entry: Entry) -> str:
     if entry.type != EntryType.COMMENTS:
         first_child = entry.statement.children[0]
         if first_child.data == "date_directive":
-            lines.append(format_date_directive(first_child))
+            line = format_date_directive(first_child)
+            tail_comment = entry.statement.children[1]
+            if tail_comment is not None:
+                line += " " + format_comment(tail_comment)
+            lines.append(line)
         else:
             # TODO:
             pass
