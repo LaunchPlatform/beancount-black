@@ -228,6 +228,19 @@ def format_date_directive(
         return " ".join(columns)
 
 
+def format_metadata_lines(metadata_list: typing.List[Metadata]) -> typing.List[str]:
+    lines: typing.List[str] = []
+    for metadata in metadata_list:
+        for comment in metadata.comments:
+            lines.append(format_comment(comment))
+        line = format_metadata_item(metadata.statement.children[0])
+        tail_comment = metadata.statement.children[1]
+        if tail_comment is not None:
+            line += " " + format_comment(tail_comment)
+        lines.append(line)
+    return lines
+
+
 def format_entry(entry: Entry) -> str:
     lines = []
     for comment in entry.comments:
@@ -241,12 +254,8 @@ def format_entry(entry: Entry) -> str:
             if tail_comment is not None:
                 line += " " + format_comment(tail_comment)
             lines.append(line)
-            for metadata in entry.metadata:
-                line = format_metadata_item(metadata.statement.children[0])
-                tail_comment = metadata.statement.children[1]
-                if tail_comment is not None:
-                    line += " " + format_comment(tail_comment)
-                lines.append(line)
+            metadata_lines = format_metadata_lines(entry.metadata)
+            lines.extend(metadata_lines)
         else:
             # TODO:
             pass

@@ -9,7 +9,9 @@
 
 ; buy dinner comment
 2022-04-03 * "In-N-Out Burger"    "Buy dinner"   #hash-1  ^link    #hash-0
+     document: "mydoc.pdf"
     Assets:Cash -20.0 USD
+        invoice: "invoice.pdf"
    Expenses:Food 20.0 USD
 
 
