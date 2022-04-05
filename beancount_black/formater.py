@@ -75,7 +75,7 @@ def get_entry_type(statement: Tree) -> EntryType:
 
 
 class StatementGroup(typing.NamedTuple):
-    org_anchor: typing.Optional[Token]
+    section_header: typing.Optional[Token]
     statements: typing.List[Tree]
 
 
@@ -138,20 +138,24 @@ class BeancountCollector:
                 if self.comment_token(first_child):
                     # already added as part of the header comments, just return
                     return
-            elif first_child.type == "ORG_ANCHOR":
-                self.org_anchor_token(first_child)
+            elif first_child.type == "SECTION_HEADER":
+                self.section_header_token(first_child)
                 return
             else:
                 raise ValueError("Unexpected token type %s", first_child.type)
         if not self.statement_groups:
-            self.statement_groups.append(StatementGroup(org_anchor=None, statements=[]))
+            self.statement_groups.append(
+                StatementGroup(section_header=None, statements=[])
+            )
         self.statement_groups[-1].statements.append(tree)
 
-    def org_anchor_token(self, token: Token):
+    def section_header_token(self, token: Token):
         self.logger.debug(
             "New statement group for %r at line %s", token.value, token.line
         )
-        self.statement_groups.append(StatementGroup(org_anchor=token, statements=[]))
+        self.statement_groups.append(
+            StatementGroup(section_header=token, statements=[])
+        )
 
     def comment_token(self, token: Token) -> bool:
         if token.line != len(self.header_comments) + 1:
@@ -345,8 +349,8 @@ def format_entry(entry: Entry, indent_width: int = 2) -> str:
 
 def format_statement_group(group: StatementGroup) -> str:
     sections: typing.List[str] = []
-    if group.org_anchor is not None:
-        sections.append(format_comment(group.org_anchor))
+    if group.section_header is not None:
+        sections.append(format_comment(group.section_header))
 
     entries: typing.List[Entry] = []
     comments: typing.List[Token] = []
