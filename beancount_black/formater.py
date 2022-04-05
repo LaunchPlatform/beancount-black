@@ -191,6 +191,51 @@ def get_amount_columns(tree: Tree) -> typing.List[str]:
     return [format_number(number), currency.value]
 
 
+def format_price(tree: Tree) -> str:
+    if tree.data not in {"per_unit_price", "total_price"}:
+        raise ValueError("Expected a per_unit_price or total_price")
+    amount = tree.children[0]
+    amount_value = " ".join(get_amount_columns(amount))
+    if tree.data == "per_unit_price":
+        prefix = "@"
+    elif tree.data == "total_price":
+        prefix = "@@"
+    else:
+        raise ValueError()
+    return " ".join([prefix, amount_value])
+
+
+def format_cost(tree: Tree) -> str:
+    if tree.data not in {"per_unit_cost", "total_cost", "both_cost", "dated_cost"}:
+        raise ValueError(
+            "Expected a per_unit_cost, total_cost, both_cost or dated_cost"
+        )
+    if tree.data != "total_cost":
+        bracket_start = "{"
+        bracket_end = "}"
+    else:
+        bracket_start = "{{"
+        bracket_end = "}}"
+    items: typing.List[str] = [bracket_start]
+    if tree.data in {"per_unit_cost", "total_cost", "dated_cost"}:
+        amount = tree.children[0]
+        amount_value = " ".join(get_amount_columns(amount))
+        items.append(amount_value)
+    if tree.data == "both_cost":
+        number, amount = tree.children
+        number_value = format_number(number)
+        amount_value = " ".join(get_amount_columns(amount))
+        items.append(number_value)
+        items.append("#")
+        items.append(amount_value)
+    elif tree.data == "dated_cost":
+        date = tree.children[1]
+        items.append(",")
+        items.append(date.value)
+    items.append(bracket_end)
+    return " ".join(items)
+
+
 def get_directive_child_columns(child: typing.Union[Token, Tree]) -> typing.List[str]:
     if isinstance(child, Token):
         # TODO: some token may need reformat?
@@ -270,9 +315,9 @@ def format_posting(
     account: Token
     amount: typing.Optional[Tree] = None
     cost: typing.Optional[Tree] = None
-    tx_price: typing.Optional[Tree] = None
+    price: typing.Optional[Tree] = None
     if tree.children[0].data == "detailed_posting":
-        flag, account, amount, cost, tx_price = tree.children[0].children
+        flag, account, amount, cost, price = tree.children[0].children
     else:
         flag, account = tree.children[0].children
     items: typing.List[str] = []
@@ -287,7 +332,10 @@ def format_posting(
         number, currency = get_amount_columns(amount)
         items.append(f"{number:{number_width}}")
         items.append(currency)
-    # TODO: other parts
+    if cost is not None:
+        items.append(format_cost(cost))
+    if price is not None:
+        items.append(format_price(price))
     return " ".join(items)
 
 

@@ -3,10 +3,13 @@ import typing
 import pytest
 from beancount_parser.parser import make_parser
 from lark import Token
+from lark import Tree
 
 from beancount_black.formater import format_comment
+from beancount_black.formater import format_cost
 from beancount_black.formater import format_date_directive
 from beancount_black.formater import format_number
+from beancount_black.formater import format_price
 
 
 @pytest.mark.parametrize(
@@ -92,3 +95,95 @@ def test_format_date_directive(
         format_date_directive(date_directive, column_widths=column_widths)
         == expected_result
     )
+
+
+@pytest.mark.parametrize(
+    "tree, expected_result",
+    [
+        (
+            Tree(
+                "per_unit_price",
+                [
+                    Tree(
+                        "amount",
+                        [Token("SIGNED_NUMBER", "1234.56"), Token("CURRENCY", "USD")],
+                    )
+                ],
+            ),
+            "@ 1,234.56 USD",
+        ),
+        (
+            Tree(
+                "total_price",
+                [
+                    Tree(
+                        "amount",
+                        [Token("SIGNED_NUMBER", "1234.56"), Token("CURRENCY", "USD")],
+                    )
+                ],
+            ),
+            "@@ 1,234.56 USD",
+        ),
+    ],
+)
+def test_format_price(tree: Tree, expected_result: str):
+    assert format_price(tree) == expected_result
+
+
+@pytest.mark.parametrize(
+    "tree, expected_result",
+    [
+        (
+            Tree(
+                "per_unit_cost",
+                [
+                    Tree(
+                        "amount",
+                        [Token("SIGNED_NUMBER", "1234.56"), Token("CURRENCY", "USD")],
+                    )
+                ],
+            ),
+            "{ 1,234.56 USD }",
+        ),
+        (
+            Tree(
+                "total_cost",
+                [
+                    Tree(
+                        "amount",
+                        [Token("SIGNED_NUMBER", "1234.56"), Token("CURRENCY", "USD")],
+                    )
+                ],
+            ),
+            "{{ 1,234.56 USD }}",
+        ),
+        (
+            Tree(
+                "both_cost",
+                [
+                    Token("SIGNED_NUMBER", "789.01"),
+                    Tree(
+                        "amount",
+                        [Token("SIGNED_NUMBER", "1234.56"), Token("CURRENCY", "USD")],
+                    ),
+                ],
+            ),
+            "{ 789.01 # 1,234.56 USD }",
+        ),
+        (
+            Tree(
+                "dated_cost",
+                [
+                    Tree(
+                        "amount",
+                        [Token("SIGNED_NUMBER", "1234.56"), Token("CURRENCY", "USD")],
+                    ),
+                    Token("DATE", "2022-04-01"),
+                ],
+            ),
+            "{ 1,234.56 USD , 2022-04-01 }",
+        ),
+    ],
+)
+def test_format_cost(tree: Tree, expected_result: str):
+    assert format_cost(tree) == expected_result
