@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "beancount-black"
 version = "0.1.0"
-description = "Just like Python's black code formatter, but for Beancount instead"
+description = "Opinioned code formatter, just like Python's black code formatter but for Beancount"
 authors = ["Fang-Pen Lin <fangpen@launchplatform.com>"]
 license = "MIT"
 
