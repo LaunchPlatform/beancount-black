@@ -1,4 +1,4 @@
-# beancount-black
+# beancount-black [![CircleCI](https://circleci.com/gh/LaunchPlatform/beancount-black/tree/master.svg?style=svg)](https://circleci.com/gh/LaunchPlatform/beancount-black/tree/master)
 Opinionated code formatter, just like Python's [black](https://pypi.org/project/black/) code formatter but for Beancount
 
 ## Features
