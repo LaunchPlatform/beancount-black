@@ -34,8 +34,9 @@ def create_backup(src: pathlib.Path, suffix: str) -> pathlib.Path:
 @click.option(
     "--backup-suffix", type=str, default=".backup", help="suffix of backup file"
 )
-@click.option("--no-backup", is_flag=True, help="Do not create backup file")
+@click.option("-n", "--no-backup", is_flag=True, help="Do not create backup file")
 def main(filename: typing.List[click.Path], backup_suffix: str, no_backup: bool):
+    logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
     parser = make_parser()
     formatter = Formatter()
@@ -59,8 +60,8 @@ def main(filename: typing.List[click.Path], backup_suffix: str, no_backup: bool)
             output_file.seek(0)
             with open(name, "wt") as input_file:
                 shutil.copyfileobj(output_file, input_file)
+    logger.info("done")
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
     main()
