@@ -186,7 +186,11 @@ class Formatter:
             return (date, entry.statement.meta.line)
         elif first_child.data == "simple_directive":
             # all simple directive child should be token, so just return them as tuple
-            return tuple(child.value for child in first_child.children[0].children)
+            return tuple(
+                child.value
+                for child in first_child.children[0].children
+                if child is not None
+            )
         raise ValueError()
 
     def format_comment(self, token: Token) -> str:
