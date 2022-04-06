@@ -38,8 +38,8 @@ class EntryType(enum.Enum):
 # The entries which are going to be listed in groups before all other entries
 LEADING_ENTRY_TYPES: typing.List[EntryType] = [
     EntryType.INCLUDE,
-    EntryType.OPTION,
     EntryType.PLUGIN,
+    EntryType.OPTION,
     EntryType.COMMODITY,
     EntryType.OPEN,
     EntryType.CLOSE,
@@ -108,7 +108,9 @@ def get_entry_sorting_key(entry: Entry) -> typing.Tuple:
     if first_child.data == "date_directive":
         date = parse_date(first_child.children[0].children[0].value)
         return (date, entry.statement.meta.line)
-    # TODO:
+    elif first_child.data == "simple_directive":
+        # all simple directive child should be token, so just return them as tuple
+        return (child.value for child in first_child.children)
     raise ValueError()
 
 
@@ -255,6 +257,16 @@ def format_metadata_item(tree: Tree) -> str:
     return f"{key_token.value}: {value_token.value}"
 
 
+def format_simple_directive(tree: Tree) -> str:
+    if tree.data != "simple_directive":
+        raise ValueError("Expected a simple directive")
+    first_child = tree.children[0]
+    items: typing.List[str] = [first_child.data.value] + [
+        child.value for child in first_child.children if child is not None
+    ]
+    return " ".join(items)
+
+
 def format_date_directive(
     tree: Tree,
     column_widths: typing.Optional[typing.Dict[str, typing.Dict[int, str]]] = None,
@@ -390,8 +402,11 @@ def format_entry(entry: Entry, indent_width: int = 2) -> str:
             for posting_line in posting_lines:
                 lines.append(" " * indent_width + posting_line)
         else:
-            # TODO:
-            pass
+            line = format_simple_directive(first_child)
+            tail_comment = entry.statement.children[1]
+            if tail_comment is not None:
+                line += " " + format_comment(tail_comment)
+            lines.append(line)
     return "\n".join(lines)
 
 
@@ -473,10 +488,6 @@ def format_statement_group(group: StatementGroup) -> str:
         if entry.type in LEADING_ENTRY_TYPES or entry_type == EntryType.COMMENTS:
             entry_type = entry.type
         entry_groups[entry_type].append(entry)
-
-    for comment_group in comments:
-        # TODO: output comment group
-        pass
 
     for entry_type in LEADING_ENTRY_TYPES:
         lines: typing.List[str] = []

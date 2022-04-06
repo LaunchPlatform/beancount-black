@@ -1,5 +1,6 @@
 ;;-*- mode: org; mode: beancount; -*-
 ;; this is my personal book
+
 1970-01-01 open Assets:Cash USD ; comment for Assets:Cash
 
 1970-01-02 open Expenses:Food USD; comment for Expenses:Food
@@ -20,3 +21,7 @@
   Assets:Cash -12345678.0 USD
     Assets:Bank 10000000.0 USD
   Expenses:ServiceFee
+
+option "foo" "bar"
+include  "accounts.bean"
+plugin "beancount.plugin"

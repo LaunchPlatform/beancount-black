@@ -1,6 +1,12 @@
 ;; -*- mode: org; mode: beancount; -*-
 ;; this is my personal book
 
+include "accounts.bean"
+
+plugin "beancount.plugin"
+
+option "foo" "bar"
+
 1970-01-01 commodity USD
 
 1970-01-01 open Assets:Cash USD ; comment for Assets:Cash
