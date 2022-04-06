@@ -45,3 +45,11 @@ bean-black -n /path/to/the/file.bean
 ```
 
 It's highly recommended to use [BeanHub](https://beanhub.io), Git or other version control system to track your Beancount book files before running the formatter against them without a backup.
+
+## Future features
+
+- Add argument for renaming account and commodity
+- Add argument for following other files from `include` statements and also format those files
+ 
+Feedbacks, bugs reporting or feature requests are welcome 🙌, just please open an issue.
+No guarantee we have time to deal with them, but will see what we can do.
