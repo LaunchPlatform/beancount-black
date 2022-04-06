@@ -28,6 +28,7 @@ class EntryType(enum.Enum):
     EVENT = "EVENT"
     COMMODITY = "COMMODITY"
     DOCUMENT = "DOCUMENT"
+    PRICE = "PRICE"
     NOTE = "NOTE"
     PAD = "PAD"
     TXN = "TXN"
@@ -56,6 +57,7 @@ DATE_DIRECTIVE_ENTRY_TYPES = {
     "event": EntryType.EVENT,
     "commodity": EntryType.COMMODITY,
     "document": EntryType.DOCUMENT,
+    "price": EntryType.PRICE,
     "note": EntryType.NOTE,
     "pad": EntryType.PAD,
     "txn": EntryType.TXN,
@@ -71,9 +73,9 @@ SIMPLE_DIRECTIVE_ENTRY_TYPES = {
 def get_entry_type(statement: Tree) -> EntryType:
     first_child: Tree = statement.children[0]
     if first_child.data == "date_directive":
-        return DATE_DIRECTIVE_ENTRY_TYPES[first_child.children[0].data]
+        return DATE_DIRECTIVE_ENTRY_TYPES[first_child.children[0].data.value]
     elif first_child.data == "simple_directive":
-        return SIMPLE_DIRECTIVE_ENTRY_TYPES[first_child.children[0].data]
+        return SIMPLE_DIRECTIVE_ENTRY_TYPES[first_child.children[0].data.value]
     else:
         raise ValueError(f"Unexpected first child type {first_child.data}")
 
@@ -184,7 +186,7 @@ class Formatter:
             return (date, entry.statement.meta.line)
         elif first_child.data == "simple_directive":
             # all simple directive child should be token, so just return them as tuple
-            return (child.value for child in first_child.children)
+            return tuple(child.value for child in first_child.children[0].children)
         raise ValueError()
 
     def format_comment(self, token: Token) -> str:
