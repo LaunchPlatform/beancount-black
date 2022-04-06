@@ -52,7 +52,7 @@ If you want to run the formatter programmatically, you can do this
 import io
 
 from beancount_parser.parser import make_parser
-from beancount_black.formater import Formatter
+from beancount_black.formatter import Formatter
 
 parser = make_parser()
 formatter = Formatter()

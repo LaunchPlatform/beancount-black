@@ -5,7 +5,7 @@ from beancount_parser.parser import make_parser
 from lark import Token
 from lark import Tree
 
-from beancount_black.formater import Formatter
+from beancount_black.formatter import Formatter
 
 
 @pytest.fixture

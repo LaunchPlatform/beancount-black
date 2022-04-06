@@ -7,7 +7,7 @@ import typing
 import click
 from beancount_parser.parser import make_parser
 
-from .formater import Formatter
+from .formatter import Formatter
 
 
 def create_backup(src: pathlib.Path, suffix: str) -> pathlib.Path:
