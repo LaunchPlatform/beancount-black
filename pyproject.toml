@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Opinioned code formatter, just like Python's black code formatter but for Beancount"
 authors = ["Fang-Pen Lin <fangpen@launchplatform.com>"]
 license = "MIT"
+repository = "https://github.com/LaunchPlatform/beancount-black"
 
 [tool.poetry.dependencies]
 python = "^3.9"
