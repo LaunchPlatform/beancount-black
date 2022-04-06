@@ -22,6 +22,8 @@
     Assets:Bank 10000000.0 USD
   Expenses:ServiceFee
 
+2022-04-01 balance Assets:Cash  -12345678.0 USD
+
 option "foo" "bar"
 include  "accounts.bean"
 plugin "beancount.plugin"

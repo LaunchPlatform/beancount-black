@@ -7,7 +7,7 @@ import typing
 import click
 from beancount_parser.parser import make_parser
 
-from .formater import format_beancount
+from .formater import Formatter
 
 
 def create_backup(src: pathlib.Path, suffix: str) -> pathlib.Path:
@@ -38,13 +38,14 @@ def create_backup(src: pathlib.Path, suffix: str) -> pathlib.Path:
 def main(filename: typing.List[click.Path], backup_suffix: str, no_backup: bool):
     logger = logging.getLogger(__name__)
     parser = make_parser()
+    formatter = Formatter()
     for name in filename:
         logger.info("Processing file %s", name)
         with open(name, "rt") as input_file:
             input_content = input_file.read()
             tree = parser.parse(input_content)
         with tempfile.NamedTemporaryFile(mode="wt+", suffix=".bean") as output_file:
-            format_beancount(tree, output_file)
+            formatter.format(tree, output_file)
             output_file.seek(0)
             output_content = output_file.read()
             if input_content == output_content:

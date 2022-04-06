@@ -5,11 +5,12 @@ from beancount_parser.parser import make_parser
 from lark import Token
 from lark import Tree
 
-from beancount_black.formater import format_comment
-from beancount_black.formater import format_cost
-from beancount_black.formater import format_date_directive
-from beancount_black.formater import format_number
-from beancount_black.formater import format_price
+from beancount_black.formater import Formatter
+
+
+@pytest.fixture
+def formatter() -> Formatter:
+    return Formatter()
 
 
 @pytest.mark.parametrize(
@@ -32,9 +33,9 @@ from beancount_black.formater import format_price
         ),
     ],
 )
-def test_format_comment(value: str, expected_result: str):
+def test_format_comment(formatter: Formatter, value: str, expected_result: str):
     token = Token("COMMENT", value=value)
-    assert format_comment(token) == expected_result
+    assert formatter.format_comment(token) == expected_result
 
 
 @pytest.mark.parametrize(
@@ -45,9 +46,9 @@ def test_format_comment(value: str, expected_result: str):
         ("1234567.90", "1,234,567.90"),
     ],
 )
-def test_format_number(value: str, expected_result: str):
+def test_format_number(formatter: Formatter, value: str, expected_result: str):
     token = Token("SIGNED_NUMBER", value=value)
-    assert format_number(token) == expected_result
+    assert formatter.format_number(token) == expected_result
 
 
 @pytest.mark.parametrize(
@@ -86,15 +87,17 @@ def test_format_number(value: str, expected_result: str):
     ],
 )
 def test_format_date_directive(
-    column_widths: typing.Optional[typing.Dict], text: str, expected_result: str
+    formatter: Formatter,
+    column_widths: typing.Optional[typing.Dict],
+    text: str,
+    expected_result: str,
 ):
     parser = make_parser()
     root = parser.parse(text)
     date_directive = root.children[0]
-    assert (
-        format_date_directive(date_directive, column_widths=column_widths)
-        == expected_result
-    )
+    if column_widths is not None:
+        formatter.date_directive_column_widths = column_widths
+    assert formatter.format_date_directive(date_directive) == expected_result
 
 
 @pytest.mark.parametrize(
@@ -126,8 +129,8 @@ def test_format_date_directive(
         ),
     ],
 )
-def test_format_price(tree: Tree, expected_result: str):
-    assert format_price(tree) == expected_result
+def test_format_price(formatter: Formatter, tree: Tree, expected_result: str):
+    assert formatter.format_price(tree) == expected_result
 
 
 @pytest.mark.parametrize(
@@ -185,5 +188,5 @@ def test_format_price(tree: Tree, expected_result: str):
         ),
     ],
 )
-def test_format_cost(tree: Tree, expected_result: str):
-    assert format_cost(tree) == expected_result
+def test_format_cost(formatter: Formatter, tree: Tree, expected_result: str):
+    assert formatter.format_cost(tree) == expected_result
