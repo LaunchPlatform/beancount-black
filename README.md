@@ -9,13 +9,13 @@ Features:
 
 # Sponsor
 
-This project is sponsored by
+The original project beancount-black was meant to be an internal tool built by [Launch Platform LLC](https://launchplatform.com) for 
 
 <p align="center">
   <a href="https://beanhub.io"><img src="/assets/beanhub.svg?raw=true" alt="BeanHub logo" /></a>
 </p>
 
-A modern accounting book service based on the most popular open source version control system [Git](https://git-scm.com/) and text-based double entry accounting book software [Beancount](https://beancount.github.io/docs/index.html).
+A modern accounting book service based on the most popular open source version control system [Git](https://git-scm.com/) and text-based double entry accounting book software [Beancount](https://beancount.github.io/docs/index.html). While SaaS business won't be required to open source an internal tool like this, still, we love the fact that the service is only possible because the open source tool we are using. We think it would be a great benefit for the community to access to a tool like this, so we've decided to open source it under MIT license.
 
 ## Install
 
