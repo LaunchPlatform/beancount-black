@@ -3,11 +3,13 @@ Opinionated code formatter, just like Python's [black](https://pypi.org/project/
 
 # Sponsor
 
-This project is sponsored by [BeanHub](https://beanhub.io) -- a modern accounting book service based on the most popular open source version control system [Git](https://git-scm.com/) and text-based double entry accounting book software [Beancount](https://beancount.github.io/docs/index.html).
+This project is sponsored by
 
 <p align="center">
-  <a href="https://beanhub.io"><img src="/assets/beanhub.png?raw=true" alt="BeanHub logo" /></a>
+  <a href="https://beanhub.io"><img src="/assets/beanhub.svg?raw=true" alt="BeanHub logo" /></a>
 </p>
+
+A modern accounting book service based on the most popular open source version control system [Git](https://git-scm.com/) and text-based double entry accounting book software [Beancount](https://beancount.github.io/docs/index.html).
 
 ## Install
 
