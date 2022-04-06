@@ -46,6 +46,22 @@ bean-black -n /path/to/the/file.bean
 
 It's highly recommended to use [BeanHub](https://beanhub.io), Git or other version control system to track your Beancount book files before running the formatter against them without a backup.
 
+If you want to run the formatter programmatically, you can do this
+
+```python
+import io
+
+from beancount_parser.parser import make_parser
+from beancount_black.formater import Formatter
+
+parser = make_parser()
+formatter = Formatter()
+
+tree = parser.parse(beancount_content)
+output_file = io.StringIO()
+formatter.format(tree, output_file)
+```
+
 ## Future features
 
 - Add argument for renaming account and commodity
