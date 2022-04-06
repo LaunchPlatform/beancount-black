@@ -28,7 +28,7 @@ bean-black /path/to/the/file.bean
 ```
 
 Then the file will be formatted.
-Since this tool is still in its early stage, a backup file at `<filepath>.backup` will be created automatically by default.
+Since this tool is still in its early stage, a backup file at `<filepath>.backup` will be created automatically by default just in case.
 The creation of backup files can be disabled by passing `-n` or `--no-backup` like this
 
 ```bash
