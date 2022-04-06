@@ -5,6 +5,7 @@ description = "Opinioned code formatter, just like Python's black code formatter
 authors = ["Fang-Pen Lin <fangpen@launchplatform.com>"]
 license = "MIT"
 repository = "https://github.com/LaunchPlatform/beancount-black"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
