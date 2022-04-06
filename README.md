@@ -13,7 +13,7 @@ Opinionated code formatter, just like Python's [black](https://pypi.org/project/
 The original project beancount-black was meant to be an internal tool built by [Launch Platform LLC](https://launchplatform.com) for 
 
 <p align="center">
-  <a href="https://beanhub.io"><img src="/assets/beanhub.svg?raw=true" alt="BeanHub logo" /></a>
+  <a href="https://beanhub.io"><img src="https://github.com/LaunchPlatform/beancount-black/raw/master/assets/beanhub.svg?raw=true" alt="BeanHub logo" /></a>
 </p>
 
 A modern accounting book service based on the most popular open source version control system [Git](https://git-scm.com/) and text-based double entry accounting book software [Beancount](https://beancount.github.io/docs/index.html).
