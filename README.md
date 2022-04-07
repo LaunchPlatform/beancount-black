@@ -1,6 +1,8 @@
 # beancount-black [![CircleCI](https://circleci.com/gh/LaunchPlatform/beancount-black/tree/master.svg?style=svg)](https://circleci.com/gh/LaunchPlatform/beancount-black/tree/master)
 Opinionated code formatter, just like Python's [black](https://pypi.org/project/black/) code formatter but for Beancount
 
+Try it out online [here](https://beanhub.io/tools/beancount-formatter)
+
 ## Features
 
 - **MIT licensed** - based on [beancount-parser](https://github.com/LaunchPlatform/beancount-parser), a [Lark](https://github.com/lark-parser/lark) based LALR(1) Beancount syntax parser
