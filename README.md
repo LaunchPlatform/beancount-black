@@ -37,7 +37,7 @@ pip install beancount-black
 Run
 
 ```bash
-bean-black /path/to/the/file.bean
+bean-black /path/to/file.bean
 ```
 
 Then the file will be formatted.
@@ -45,7 +45,7 @@ Since this tool is still in its early stage, a backup file at `<filepath>.backup
 The creation of backup files can be disabled by passing `-n` or `--no-backup` like this
 
 ```bash
-bean-black -n /path/to/the/file.bean
+bean-black -n /path/to/file.bean
 ```
 
 It's highly recommended to use [BeanHub](https://beanhub.io), Git or other version control system to track your Beancount book files before running the formatter against them without a backup.
