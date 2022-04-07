@@ -19,7 +19,7 @@ The original project beancount-black was meant to be an internal tool built by [
 </p>
 
 A modern accounting book service based on the most popular open source version control system [Git](https://git-scm.com/) and text-based double entry accounting book software [Beancount](https://beancount.github.io/docs/index.html).
-We realized adding new entries automatically over time makes beancount file a mess.
+We realized adding new entries with BeanHub automatically over time makes beancount file a mess.
 So obviously, a strong code formatter is needed.
 While SaaS businesses won't be required to open source an internal tool like this, we still love that the service is only possible because of the open-source tool we are using.
 We think it would be greatly beneficial for the community to access a tool like this, so we've decided to open source it under MIT license, hope you find this tool useful 😄
