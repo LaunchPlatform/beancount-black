@@ -14,6 +14,8 @@ option "foo" "bar"
 1970-01-02 open Expenses:Food USD ; comment for Expenses:Food
 1970-01-03 open Expenses:ServiceFee USD
 
+1970-01-01 custom "string val" 123.45 USD TRUE FALSE 2022-04-01 Assets:Bank
+
 2022-04-01 balance Assets:Cash                          -12,345,678.0 USD
 
 2022-04-02 * "Save money into bank" #hash-1 ; comment for save money into bank

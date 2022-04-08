@@ -24,6 +24,8 @@
 
 2022-04-01 balance Assets:Cash  -12345678.0 USD
 
+1970-01-01 custom  "string val"     123.45  USD    TRUE  FALSE  2022-04-01  Assets:Bank
+
 option "foo" "bar"
 include  "accounts.bean"
 plugin "beancount.plugin"

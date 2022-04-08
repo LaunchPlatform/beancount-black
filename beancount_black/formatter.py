@@ -35,6 +35,7 @@ class EntryType(enum.Enum):
     PRICE = "PRICE"
     NOTE = "NOTE"
     PAD = "PAD"
+    CUSTOM = "CUSTOM"
     TXN = "TXN"
     # Simple directives
     OPTION = "OPTION"
@@ -64,6 +65,7 @@ DATE_DIRECTIVE_ENTRY_TYPES = {
     "price": EntryType.PRICE,
     "note": EntryType.NOTE,
     "pad": EntryType.PAD,
+    "custom": EntryType.CUSTOM,
     "txn": EntryType.TXN,
 }
 
