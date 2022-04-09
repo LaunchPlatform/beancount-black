@@ -14,7 +14,7 @@ from lark import Tree
 
 COMMENT_PREFIX = re.compile("[;*]+")
 DEFAULT_INDENT_WIDTH = 2
-DEFAULT_ACCOUNT_WIDTH = 50
+DEFAULT_ACCOUNT_WIDTH = 40
 DEFAULT_NUMBER_WIDTH = 12
 # the difference of column width we need to make up for balance account field,
 # so a balance statement starts with
