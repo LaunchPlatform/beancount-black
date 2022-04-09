@@ -15,12 +15,13 @@ from lark import Tree
 COMMENT_PREFIX = re.compile("[;*]+")
 DEFAULT_INDENT_WIDTH = 2
 DEFAULT_ACCOUNT_WIDTH = 50
-DEFAULT_POSTING_ACCOUNT_WIDTH = f"{DEFAULT_ACCOUNT_WIDTH}"
-DEFAULT_POSTING_NUMBER_WIDTH = ">16"
-BALANCE_PREFIX_WIDTH = 17
-DEFAULT_DATE_DIRECTIVE_COLUMN_WIDTHS = dict(
-    balance={2: f"{DEFAULT_ACCOUNT_WIDTH - BALANCE_PREFIX_WIDTH}", 3: ">16"}
-)
+DEFAULT_NUMBER_WIDTH = 12
+# the difference of column width we need to make up for balance account field,
+# so a balance statement starts with
+#
+#   "2022-01-01 balance "
+#
+BALANCE_PREFIX_WIDTH = 19
 
 
 @enum.unique
@@ -174,16 +175,12 @@ class Formatter:
     def __init__(
         self,
         indent_width: int = DEFAULT_INDENT_WIDTH,
-        posting_account_width: str = DEFAULT_POSTING_ACCOUNT_WIDTH,
-        posting_number_width: str = DEFAULT_POSTING_NUMBER_WIDTH,
-        date_directive_column_widths: typing.Dict[
-            str, typing.Dict[int, str]
-        ] = DEFAULT_DATE_DIRECTIVE_COLUMN_WIDTHS,
+        min_account_width: int = DEFAULT_ACCOUNT_WIDTH,
+        min_number_width: int = DEFAULT_NUMBER_WIDTH,
     ):
         self.indent_width = indent_width
-        self.posting_account_width = posting_account_width
-        self.posting_number_width = posting_number_width
-        self.date_directive_column_widths = date_directive_column_widths
+        self.account_width = min_account_width
+        self.number_width = min_number_width
 
     def get_entry_sorting_key(self, entry: Entry) -> typing.Tuple:
         first_child = entry.statement.children[0]
@@ -322,15 +319,21 @@ class Formatter:
                 if child is None:
                     continue
                 columns.extend(self.get_directive_child_columns(child))
-            directive_column_width = self.date_directive_column_widths.get(
-                directive_type
-            )
-            if directive_column_width is not None:
+            if directive_type == "balance":
                 for index, column in enumerate(columns):
-                    width = directive_column_width.get(index)
-                    if width is None:
+                    prefix = ""
+                    # account
+                    if index == 2:
+                        width = self.account_width - (
+                            BALANCE_PREFIX_WIDTH - self.indent_width
+                        )
+                    # number
+                    elif index == 3:
+                        width = self.number_width
+                        prefix = ">"
+                    else:
                         continue
-                    new_value = f"{column:{width}}"
+                    new_value = f"{column:{prefix}{width}}"
                     columns[index] = new_value
             return " ".join(columns)
 
@@ -353,11 +356,11 @@ class Formatter:
         account_value = account.value
         if amount is not None:
             # only need to apply width when it's not short posting format
-            account_value = f"{account_value:{self.posting_account_width}}"
+            account_value = f"{account_value:{self.account_width}}"
         items.append(account_value)
         if amount is not None:
             number, currency = self.get_amount_columns(amount)
-            items.append(f"{number:{self.posting_number_width}}")
+            items.append(f"{number:>{self.number_width}}")
             items.append(currency)
         if cost is not None:
             items.append(self.format_cost(cost))
@@ -521,9 +524,43 @@ class Formatter:
 
         return "\n\n".join(sections)
 
+    def calculate_column_widths(self, tree: ParseTree):
+        for statement in tree.children:
+            if statement is None:
+                continue
+            first_child = statement.children[0]
+            if isinstance(first_child, Token):
+                continue
+            account: typing.Optional[Token] = None
+            amount: typing.Optional[Tree] = None
+            if first_child.data == "posting":
+                # Simple posting
+                if first_child.children[0].data == "detailed_posting":
+                    _, account, amount, *_ = first_child.children[0].children
+                else:
+                    _, account = first_child.children[0].children
+            elif first_child.data == "date_directive":
+                if first_child.children[0].data == "balance":
+                    _, account, amount = first_child.children[0].children
+            balance_account_column_diff = BALANCE_PREFIX_WIDTH - self.indent_width
+            if (
+                account is not None
+                and len(account.value) + balance_account_column_diff
+                > self.account_width
+            ):
+                # bump account width
+                self.account_width = len(account.value) + balance_account_column_diff
+            if amount is not None:
+                width = len(self.format_number(amount.children[0]))
+                if width > self.number_width:
+                    # bump number width
+                    self.number_width = width
+
     def format(self, tree: ParseTree, output_file: io.TextIOBase):
         if tree.data != "start":
             raise ValueError("expected start as the root rule")
+        self.calculate_column_widths(tree)
+
         collector = Collector()
         collector.collect(tree)
 

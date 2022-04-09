@@ -1,0 +1,6 @@
+2022-04-01 balance Assets:Cash                                                             -10.0 USD
+
+2022-04-02 *
+  Assets:ABCDEFGHIJKLMNOPQRSTUVWXYZ:ABCDEFGHIJKLMNOPQRSTUVWXYZ                  -1,234,567,890.0 USD
+
+2022-04-03 balance Assets:ABCDEFGHIJKLMNOPQRSTUVWXYZ:ABCDEFGHIJKLMNOPQRSTUVWXYZ -1,234,567,890.0 USD
