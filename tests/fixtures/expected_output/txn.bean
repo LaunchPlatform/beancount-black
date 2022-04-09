@@ -1,0 +1,7 @@
+2022-04-09 txn "Narration"
+  Assets:Bank                                            10.45 USD
+  Assets:Cash                                           -10.45 USD
+
+2022-04-10 txn "payee" "Narration"
+  Assets:Bank                                            10.45 USD
+  Assets:Cash                                           -10.45 USD

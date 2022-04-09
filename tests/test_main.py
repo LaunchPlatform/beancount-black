@@ -37,6 +37,7 @@ def test_create_backup_with_conflicts(tmp_path: pathlib.Path):
         ("header_comments.bean", "header_comments.bean"),
         ("sections.bean", "sections.bean"),
         ("column_width.bean", "column_width.bean"),
+        ("txn.bean", "txn.bean"),
     ],
 )
 def test_main(
