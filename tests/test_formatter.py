@@ -80,7 +80,7 @@ def test_format_number(formatter: Formatter, value: str, expected_result: str):
             "1970-01-01 close Assets:Bank",
         ),
         (
-            dict(balance={2: "20", 3: ">10"}),
+            dict(account_width=20, number_width=10),
             "1970-01-01  balance     Assets:Bank  12.34    USD",
             "1970-01-01 balance Assets:Bank               12.34 USD",
         ),
@@ -96,7 +96,8 @@ def test_format_date_directive(
     root = parser.parse(text)
     date_directive = root.children[0]
     if column_widths is not None:
-        formatter.date_directive_column_widths = column_widths
+        for key, value in column_widths.items():
+            setattr(formatter, key, value)
     assert formatter.format_date_directive(date_directive) == expected_result
 
 

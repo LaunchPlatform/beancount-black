@@ -16,16 +16,16 @@ option "foo" "bar"
 
 1970-01-01 custom "string val" 123.45 USD TRUE FALSE 2022-04-01 Assets:Bank
 
-2022-04-01 balance Assets:Cash             -12,345,678.0 USD
+2022-04-01 balance Assets:Cash                    -12,345,678.0 USD
 
 2022-04-02 * "Save money into bank" #hash-1 ; comment for save money into bank
-  Assets:Cash                              -12,345,678.0 USD
-  Assets:Bank                               10,000,000.0 USD
+  Assets:Cash                                     -12,345,678.0 USD
+  Assets:Bank                                      10,000,000.0 USD
   Expenses:ServiceFee
 
 ; buy dinner comment
 2022-04-03 * "In-N-Out Burger" "Buy dinner" ^link #hash-0 #hash-1
   document: "mydoc.pdf"
-  Assets:Cash                                      -20.0 USD
+  Assets:Cash                                             -20.0 USD
     invoice: "invoice.pdf"
-  Expenses:Food                                     20.0 USD
+  Expenses:Food                                            20.0 USD

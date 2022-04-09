@@ -14,7 +14,7 @@ from lark import Tree
 
 COMMENT_PREFIX = re.compile("[;*]+")
 DEFAULT_INDENT_WIDTH = 2
-DEFAULT_ACCOUNT_WIDTH = 40
+DEFAULT_ACCOUNT_WIDTH = 30
 DEFAULT_NUMBER_WIDTH = 12
 # the difference of column width we need to make up for balance account field,
 # so a balance statement starts with
@@ -324,9 +324,7 @@ class Formatter:
                     prefix = ""
                     # account
                     if index == 2:
-                        width = self.account_width - (
-                            BALANCE_PREFIX_WIDTH - self.indent_width
-                        )
+                        width = self.account_width
                     # number
                     elif index == 3:
                         width = self.number_width
@@ -354,9 +352,11 @@ class Formatter:
         if flag is not None:
             items.append(flag.value)
         account_value = account.value
+        # only need to apply width when it's not short posting format
         if amount is not None:
-            # only need to apply width when it's not short posting format
-            account_value = f"{account_value:{self.account_width}}"
+            # Need to add the difference for balance prefix width
+            width = self.account_width + (BALANCE_PREFIX_WIDTH - self.indent_width)
+            account_value = f"{account_value:{width}}"
         items.append(account_value)
         if amount is not None:
             number, currency = self.get_amount_columns(amount)
@@ -543,13 +543,9 @@ class Formatter:
                 if first_child.children[0].data == "balance":
                     _, account, amount = first_child.children[0].children
             balance_account_column_diff = BALANCE_PREFIX_WIDTH - self.indent_width
-            if (
-                account is not None
-                and len(account.value) + balance_account_column_diff
-                > self.account_width
-            ):
+            if account is not None and len(account.value) > self.account_width:
                 # bump account width
-                self.account_width = len(account.value) + balance_account_column_diff
+                self.account_width = len(account.value)
             if amount is not None:
                 width = len(self.format_number(amount.children[0]))
                 if width > self.number_width:
