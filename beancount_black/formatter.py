@@ -240,7 +240,7 @@ class Formatter:
         else:
             bracket_start = "{{"
             bracket_end = "}}"
-        items: typing.List[str] = [bracket_start]
+        items: typing.List[str] = []
         if tree.data in {"per_unit_cost", "total_cost", "dated_cost"}:
             amount = tree.children[0]
             amount_value = " ".join(self.get_amount_columns(amount))
@@ -256,8 +256,7 @@ class Formatter:
             date = tree.children[1]
             items[-1] += ","
             items.append(date.value)
-        items.append(bracket_end)
-        return " ".join(items)
+        return bracket_start + " ".join(items) + bracket_end
 
     def get_directive_child_columns(
         self, child: typing.Union[Token, Tree]
