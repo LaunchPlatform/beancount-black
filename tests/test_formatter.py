@@ -185,7 +185,7 @@ def test_format_price(formatter: Formatter, tree: Tree, expected_result: str):
                     Token("DATE", "2022-04-01"),
                 ],
             ),
-            "{ 1,234.56 USD , 2022-04-01 }",
+            "{ 1,234.56 USD, 2022-04-01 }",
         ),
     ],
 )

@@ -254,7 +254,7 @@ class Formatter:
             items.append(amount_value)
         elif tree.data == "dated_cost":
             date = tree.children[1]
-            items.append(",")
+            items[-1] += ","
             items.append(date.value)
         items.append(bracket_end)
         return " ".join(items)
