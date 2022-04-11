@@ -48,6 +48,7 @@ class EntryType(enum.Enum):
 
 # The entries which are going to be listed in groups before all other entries
 LEADING_ENTRY_TYPES: typing.List[EntryType] = [
+    EntryType.COMMENTS,
     EntryType.INCLUDE,
     EntryType.PLUGIN,
     EntryType.OPTION,
@@ -501,7 +502,7 @@ class Formatter:
         ] = collections.defaultdict(list)
         for entry in entries:
             entry_type: typing.Optional[EntryType] = None
-            if entry.type in LEADING_ENTRY_TYPES or entry_type == EntryType.COMMENTS:
+            if entry.type in LEADING_ENTRY_TYPES:
                 entry_type = entry.type
             entry_groups[entry_type].append(entry)
 
