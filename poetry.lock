@@ -22,7 +22,7 @@ tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>
 
 [[package]]
 name = "beancount-parser"
-version = "0.1.20"
+version = "0.1.21"
 description = "Standalone Lark based Beancount syntax parser (not relying on Beancount library), MIT license"
 category = "main"
 optional = false
@@ -145,7 +145,7 @@ python-versions = ">=3.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "4d6ce0d6bb2ade2fc7d316f8a1ad5caa6922b45dcd5df4e7b4b3687c3dc92180"
+content-hash = "89a468845db216de6ef29a2eecf69dc2bf6a3b00ca55f488fe333ef1e1202212"
 
 [metadata.files]
 atomicwrites = [
@@ -157,8 +157,8 @@ attrs = [
     {file = "attrs-21.4.0.tar.gz", hash = "sha256:626ba8234211db98e869df76230a137c4c40a12d72445c45d5f5b716f076e2fd"},
 ]
 beancount-parser = [
-    {file = "beancount-parser-0.1.20.tar.gz", hash = "sha256:4ea5a9127bf9a15ef23f377600695d3e7d8dbfdb99f0ea2cd75caf4687d709e0"},
-    {file = "beancount_parser-0.1.20-py3-none-any.whl", hash = "sha256:2f3475ad743fe0b481dd56ddf140a1bf171b07d39c14de579792872b7951778c"},
+    {file = "beancount-parser-0.1.21.tar.gz", hash = "sha256:84be7f17db5c53e38c5103881e788beb71648214178ec66fc9b2348d91e0f555"},
+    {file = "beancount_parser-0.1.21-py3-none-any.whl", hash = "sha256:5f2a5de7f2f754cd35c58b0f63bbb30a3d09ebf73051b3e4c884873904d0d85b"},
 ]
 click = [
     {file = "click-8.1.2-py3-none-any.whl", hash = "sha256:24e1a4a9ec5bf6299411369b208c1df2188d9eb8d916302fe6bf03faed227f1e"},

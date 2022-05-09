@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "beancount-black"
-version = "0.1.12"
+version = "0.1.13"
 description = "Opinioned code formatter, just like Python's black code formatter but for Beancount"
 authors = ["Fang-Pen Lin <fangpen@launchplatform.com>"]
 license = "MIT"
@@ -9,7 +9,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-beancount-parser = "^0.1.20"
+beancount-parser = "^0.1.21"
 click = ">=7.0.0,<9.0.0"
 
 [tool.poetry.dev-dependencies]
