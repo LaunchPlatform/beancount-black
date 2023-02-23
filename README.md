@@ -1,7 +1,7 @@
 # beancount-black [![CircleCI](https://circleci.com/gh/LaunchPlatform/beancount-black/tree/master.svg?style=svg)](https://circleci.com/gh/LaunchPlatform/beancount-black/tree/master)
 Opinionated code formatter, just like Python's [black](https://pypi.org/project/black/) code formatter but for Beancount
 
-Try it out online [here](https://beanhub.io/tools/beancount-formatter)
+Try it out online [here](https://app.beanhub.io/tools/beancount-formatter)
 
 ## Features
 
