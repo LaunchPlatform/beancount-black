@@ -336,6 +336,8 @@ class Formatter:
             return [",".join(currency.value for currency in tree.children)]
         elif tree.data == "amount":
             return self.get_amount_columns(tree)
+        elif tree.data == "number_expr":
+            return [self.format_number_expr(tree)]
         raise ValueError(f"Unknown tree type {tree.data}")
 
     def format_metadata_item(self, tree: Tree) -> str:

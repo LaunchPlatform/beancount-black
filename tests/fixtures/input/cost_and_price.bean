@@ -1,7 +1,7 @@
 2022-04-01
-  Assets 20.0 USD  @ 12345.67 TWD
-  Assets 20.0 USD    @@ 12345.67 TWD
- Assets 1.0 BTC {12345 USD}
-  Assets 1.0 BTC {{12345 USD     }}
-  Assets 1.0 BTC {12345 #    6789  USD}
-   Assets 1.0 BTC {12345 USD, 2022-03-01   }
+  Assets:Cash 20.0 USD  @ 12345.67 TWD
+  Assets:Cash 20.0 USD    @@ 12345.67 TWD
+ Assets:Cash 1.0 BTC {12345 USD}
+  Assets:Cash 1.0 BTC {{12345 USD     }}
+  Assets:Cash 1.0 BTC {12345 #    6789  USD}
+   Assets:Cash 1.0 BTC {12345 USD, 2022-03-01   }
