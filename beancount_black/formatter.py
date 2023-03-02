@@ -599,12 +599,12 @@ class Formatter:
     def calculate_column_widths(self, tree: ParseTree):
         self.logger.info("Calculate column width")
         for statement in tree.children:
+            if statement is None:
+                continue
             self.logger.debug(
                 "Calculate column width for statement at line %s", statement.meta.line
             )
             self.logger.log(VERBOSE_LOG_LEVEL, "Statement %s", statement)
-            if statement is None:
-                continue
             first_child = statement.children[0]
             if isinstance(first_child, Token):
                 continue
