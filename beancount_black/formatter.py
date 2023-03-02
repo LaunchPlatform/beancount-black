@@ -127,6 +127,7 @@ class Collector:
         self.statement_groups: typing.List[StatementGroup] = []
 
     def collect(self, tree: Tree):
+        self.logger.info("Collecting")
         if tree.data != "start":
             raise ValueError("Expected start")
         for child in tree.children:
@@ -137,6 +138,7 @@ class Collector:
     def statement(self, tree: Tree):
         if tree.data != "statement":
             raise ValueError("Expected statement")
+        self.logger.debug("Collecting statement at line %s", tree.meta.line)
         first_child = tree.children[0]
         if isinstance(first_child, Token):
             # Comment only line
@@ -210,15 +212,76 @@ class Formatter:
         return f"{prefix} {remain}"
 
     def format_number(self, token: Token) -> str:
+        if token.type != "NUMBER":
+            raise ValueError("Expected a NUMBER")
         value = token.value.replace(",", "")
         number = decimal.Decimal(value)
         return f"{number:,}"
+
+    def format_number_atom(self, tree_or_token: typing.Union[Tree, Token]) -> str:
+        if isinstance(tree_or_token, Token):
+            token: Token = tree_or_token
+            if token.type == "NUMBER":
+                return self.format_number(token)
+            else:
+                raise ValueError(f"Unknown token type {token.type}")
+        elif isinstance(tree_or_token, Tree):
+            tree: Tree = tree_or_token
+            if tree.data == "number_atom":
+                unary_op, number_atom = tree.children
+                if unary_op.type != "UNARY_OP":
+                    raise ValueError(f"Expected to be UNARY_OP but got {unary_op.data}")
+                return unary_op.value + self.format_number_atom(number_atom)
+            elif tree.data == "number_mul_expr":
+                return self.format_number_mul_expr(tree)
+            elif tree.data == "number_add_expr":
+                return self.format_number_add_expr(tree)
+            else:
+                raise ValueError(f"Unknown tree {tree.data}")
+        else:
+            raise ValueError(f"Unexpected type {type(tree_or_token)}")
+
+    def format_number_mul_expr(self, tree: Tree) -> str:
+        if tree.data != "number_mul_expr":
+            raise ValueError("Expected a number_mul_expr")
+        items: typing.List[str] = []
+        for child in tree.children:
+            if isinstance(child, Token):
+                if child.type == "MUL_OP":
+                    items.append(f" {child.value} ")
+                else:
+                    items.append(self.format_number_atom(child))
+            else:
+                items.append(self.format_number_atom(child))
+        return "".join(items)
+
+    def format_number_add_expr(self, tree: Tree) -> str:
+        if tree.data != "number_add_expr":
+            raise ValueError("Expected a number_add_expr")
+        items: typing.List[str] = []
+        for child in tree.children:
+            if isinstance(child, Token):
+                if child.type == "ADD_OP":
+                    items.append(f" {child.value} ")
+                else:
+                    items.append(self.format_number_atom(child))
+            else:
+                items.append(self.format_number_mul_expr(child))
+        return f'({"".join(items)})'
+
+    def format_number_expr(self, tree: Tree) -> str:
+        if tree.data != "number_expr":
+            raise ValueError("Expected a number_expr")
+        first_child: typing.Union[Tree, Token] = tree.children[0]
+        if isinstance(first_child, Tree) and first_child.data == "number_add_expr":
+            return self.format_number_add_expr(first_child)
+        return self.format_number_atom(first_child)
 
     def get_amount_columns(self, tree: Tree) -> typing.List[str]:
         if tree.data != "amount":
             raise ValueError("Expected a amount")
         number, currency = tree.children
-        return [self.format_number(number), currency.value]
+        return [self.format_number_expr(number), currency.value]
 
     def format_price(self, tree: Tree) -> str:
         if tree.data not in {"per_unit_price", "total_price"}:
@@ -251,7 +314,7 @@ class Formatter:
             items.append(amount_value)
         if tree.data == "both_cost":
             number, amount = tree.children
-            number_value = self.format_number(number)
+            number_value = self.format_number_expr(number)
             amount_value = " ".join(self.get_amount_columns(amount))
             items.append(number_value)
             items.append("#")
@@ -534,7 +597,12 @@ class Formatter:
         return "\n\n".join(sections)
 
     def calculate_column_widths(self, tree: ParseTree):
+        self.logger.info("Calculate column width")
         for statement in tree.children:
+            self.logger.debug(
+                "Calculate column width for statement at line %s", statement.meta.line
+            )
+            self.logger.log(VERBOSE_LOG_LEVEL, "Statement %s", statement)
             if statement is None:
                 continue
             first_child = statement.children[0]
@@ -556,7 +624,7 @@ class Formatter:
                 # bump account width
                 self.account_width = len(account.value)
             if amount is not None:
-                width = len(self.format_number(amount.children[0]))
+                width = len(self.format_number_expr(amount.children[0]))
                 if width > self.number_width:
                     # bump number width
                     self.number_width = width
