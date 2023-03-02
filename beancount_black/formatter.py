@@ -11,6 +11,7 @@ from lark import ParseTree
 from lark import Token
 from lark import Tree
 
+VERBOSE_LOG_LEVEL = logging.NOTSET + 1
 
 COMMENT_PREFIX = re.compile("[;*]+")
 DEFAULT_INDENT_WIDTH = 2
@@ -118,7 +119,7 @@ def parse_date(date_str: str) -> datetime.date:
 
 
 class Collector:
-    def __init__(self, logger=None):
+    def __init__(self, logger: typing.Optional[logging.Logger] = None):
         super().__init__()
         self.logger = logger or logging.getLogger(__name__)
         # Collection of the header comments
@@ -178,10 +179,12 @@ class Formatter:
         indent_width: int = DEFAULT_INDENT_WIDTH,
         min_account_width: int = DEFAULT_ACCOUNT_WIDTH,
         min_number_width: int = DEFAULT_NUMBER_WIDTH,
+        logger: typing.Optional[logging.Logger] = None,
     ):
         self.indent_width = indent_width
         self.account_width = min_account_width
         self.number_width = min_number_width
+        self.logger = logger or logging.getLogger(__name__)
 
     def get_entry_sorting_key(self, entry: Entry) -> typing.Tuple:
         first_child = entry.statement.children[0]
@@ -401,6 +404,12 @@ class Formatter:
         return lines
 
     def format_entry(self, entry: Entry) -> str:
+        self.logger.debug(
+            "Format entry type %s at line %s",
+            entry.type.value,
+            entry.statement.meta.line,
+        )
+        self.logger.log(VERBOSE_LOG_LEVEL, "Entry value %s", entry)
         lines = []
         for comment in entry.comments:
             lines.append(self.format_comment(comment))
