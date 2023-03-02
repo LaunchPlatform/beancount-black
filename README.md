@@ -68,6 +68,28 @@ output_file = io.StringIO()
 formatter.format(tree, output_file)
 ```
 
+## Debug
+
+Sometimes you might encounter problems when formatting some beancount files.
+To debug and better understand which line is causing the problem, you can change the log level by passing `-l` argument with `debug` or `verbose`.
+For example:
+
+```bash
+bean-black -n /path/to/file.bean -l verbose
+```
+
+With `verbose`, details of the parsed object will be printed.
+With `debug`, only the line number and type of entry will be printed.
+You can also use `LOG_LEVEL` environment variable as well.
+The available log level options are:
+
+- verbose
+- debug
+- info (default)
+- error
+- warning
+- fatal
+
 ## Future features
 
 - Add argument for renaming account and commodity
