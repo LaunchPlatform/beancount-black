@@ -1,4 +1,5 @@
 import logging
+import os
 import pathlib
 import shutil
 import tempfile
@@ -8,6 +9,17 @@ import click
 from beancount_parser.parser import make_parser
 
 from .formatter import Formatter
+from .formatter import VERBOSE_LOG_LEVEL
+
+
+LOG_LEVEL_MAP = {
+    "verbose": VERBOSE_LOG_LEVEL,
+    "debug": logging.DEBUG,
+    "info": logging.INFO,
+    "warning": logging.WARNING,
+    "error": logging.ERROR,
+    "fatal": logging.FATAL,
+}
 
 
 def create_backup(src: pathlib.Path, suffix: str) -> pathlib.Path:
@@ -34,9 +46,20 @@ def create_backup(src: pathlib.Path, suffix: str) -> pathlib.Path:
 @click.option(
     "--backup-suffix", type=str, default=".backup", help="suffix of backup file"
 )
+@click.option(
+    "-l",
+    "--log-level",
+    type=click.Choice(list(LOG_LEVEL_MAP), case_sensitive=False),
+    default=lambda: os.environ.get("LOG_LEVEL", "INFO"),
+)
 @click.option("-n", "--no-backup", is_flag=True, help="Do not create backup file")
-def main(filename: typing.List[click.Path], backup_suffix: str, no_backup: bool):
-    logging.basicConfig(level=logging.INFO)
+def main(
+    filename: typing.List[click.Path],
+    backup_suffix: str,
+    log_level: str,
+    no_backup: bool,
+):
+    logging.basicConfig(level=LOG_LEVEL_MAP[log_level])
     logger = logging.getLogger(__name__)
     parser = make_parser()
     formatter = Formatter()

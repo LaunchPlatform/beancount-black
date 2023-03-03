@@ -39,16 +39,65 @@ def test_format_comment(formatter: Formatter, value: str, expected_result: str):
 
 
 @pytest.mark.parametrize(
-    "value, expected_result",
+    "tree, expected_result",
     [
-        ("+123.4567", "123.4567"),
-        ("-123.4567", "-123.4567"),
-        ("1234567.90", "1,234,567.90"),
+        (
+            Tree(
+                "number_expr",
+                [
+                    Tree(
+                        "number_mul_expr",
+                        [
+                            Tree(
+                                "number_add_expr",
+                                [
+                                    Token("NUMBER", "1"),
+                                    Token("ADD_OP", "+"),
+                                    Token("NUMBER", "2"),
+                                ],
+                            ),
+                            Token("MUL_OP", "*"),
+                            Token("NUMBER", "3"),
+                            Token("MUL_OP", "/"),
+                            Tree(
+                                "number_atom",
+                                [Token("UNARY_OP", "-"), Token("NUMBER", "4")],
+                            ),
+                        ],
+                    )
+                ],
+            ),
+            "((1 + 2) * 3 / -4)",
+        ),
+        (
+            Tree(
+                "number_expr",
+                [
+                    Tree(
+                        "number_atom",
+                        [Token("UNARY_OP", "-"), Token("NUMBER", "123.4567")],
+                    )
+                ],
+            ),
+            "-123.4567",
+        ),
+        (
+            Tree(
+                "number_expr",
+                [
+                    Tree(
+                        "number_atom",
+                        [Token("UNARY_OP", "+"), Token("NUMBER", "123.4567")],
+                    )
+                ],
+            ),
+            "+123.4567",
+        ),
+        (Tree("number_expr", [Token("NUMBER", value="1234567.90")]), "1,234,567.90"),
     ],
 )
-def test_format_number(formatter: Formatter, value: str, expected_result: str):
-    token = Token("SIGNED_NUMBER", value=value)
-    assert formatter.format_number(token) == expected_result
+def test_format_number_expr(formatter: Formatter, tree: Tree, expected_result: str):
+    assert formatter.format_number_expr(tree) == expected_result
 
 
 @pytest.mark.parametrize(
@@ -110,7 +159,10 @@ def test_format_date_directive(
                 [
                     Tree(
                         "amount",
-                        [Token("SIGNED_NUMBER", "1234.56"), Token("CURRENCY", "USD")],
+                        [
+                            Tree("number_expr", [Token("NUMBER", "1234.56")]),
+                            Token("CURRENCY", "USD"),
+                        ],
                     )
                 ],
             ),
@@ -122,7 +174,10 @@ def test_format_date_directive(
                 [
                     Tree(
                         "amount",
-                        [Token("SIGNED_NUMBER", "1234.56"), Token("CURRENCY", "USD")],
+                        [
+                            Tree("number_expr", [Token("NUMBER", "1234.56")]),
+                            Token("CURRENCY", "USD"),
+                        ],
                     )
                 ],
             ),
@@ -143,7 +198,10 @@ def test_format_price(formatter: Formatter, tree: Tree, expected_result: str):
                 [
                     Tree(
                         "amount",
-                        [Token("SIGNED_NUMBER", "1234.56"), Token("CURRENCY", "USD")],
+                        [
+                            Tree("number_expr", [Token("NUMBER", "1234.56")]),
+                            Token("CURRENCY", "USD"),
+                        ],
                     )
                 ],
             ),
@@ -155,7 +213,10 @@ def test_format_price(formatter: Formatter, tree: Tree, expected_result: str):
                 [
                     Tree(
                         "amount",
-                        [Token("SIGNED_NUMBER", "1234.56"), Token("CURRENCY", "USD")],
+                        [
+                            Tree("number_expr", [Token("NUMBER", "1234.56")]),
+                            Token("CURRENCY", "USD"),
+                        ],
                     )
                 ],
             ),
@@ -165,10 +226,13 @@ def test_format_price(formatter: Formatter, tree: Tree, expected_result: str):
             Tree(
                 "both_cost",
                 [
-                    Token("SIGNED_NUMBER", "789.01"),
+                    Tree("number_expr", [Token("NUMBER", "789.01")]),
                     Tree(
                         "amount",
-                        [Token("SIGNED_NUMBER", "1234.56"), Token("CURRENCY", "USD")],
+                        [
+                            Tree("number_expr", [Token("NUMBER", "1234.56")]),
+                            Token("CURRENCY", "USD"),
+                        ],
                     ),
                 ],
             ),
@@ -180,7 +244,10 @@ def test_format_price(formatter: Formatter, tree: Tree, expected_result: str):
                 [
                     Tree(
                         "amount",
-                        [Token("SIGNED_NUMBER", "1234.56"), Token("CURRENCY", "USD")],
+                        [
+                            Tree("number_expr", [Token("NUMBER", "1234.56")]),
+                            Token("CURRENCY", "USD"),
+                        ],
                     ),
                     Token("DATE", "2022-04-01"),
                 ],
