@@ -67,7 +67,7 @@ def test_format_comment(formatter: Formatter, value: str, expected_result: str):
                     )
                 ],
             ),
-            "(1 + 2) * 3 / -4",
+            "((1 + 2) * 3 / -4)",
         ),
         (
             Tree(
