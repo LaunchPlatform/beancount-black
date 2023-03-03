@@ -253,7 +253,7 @@ class Formatter:
                     items.append(self.format_number_atom(child))
             else:
                 items.append(self.format_number_atom(child))
-        return "".join(items)
+        return f'({"".join(items)})'
 
     def format_number_add_expr(self, tree: Tree) -> str:
         if tree.data != "number_add_expr":
@@ -265,6 +265,8 @@ class Formatter:
                     items.append(f" {child.value} ")
                 else:
                     items.append(self.format_number_atom(child))
+            elif isinstance(child, Tree) and child.data == "number_atom":
+                items.append(self.format_number_atom(child))
             else:
                 items.append(self.format_number_mul_expr(child))
         return f'({"".join(items)})'
