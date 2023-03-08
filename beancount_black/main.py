@@ -1,7 +1,9 @@
+import io
 import logging
 import os
 import pathlib
 import shutil
+import sys
 import tempfile
 import typing
 
@@ -42,9 +44,15 @@ def create_backup(src: pathlib.Path, suffix: str) -> pathlib.Path:
 
 
 @click.command()
-@click.argument("filename", type=click.Path(exists=True, dir_okay=False), nargs=-1)
+@click.argument("filename", type=click.Path(exists=False, dir_okay=False), nargs=-1)
 @click.option(
     "--backup-suffix", type=str, default=".backup", help="suffix of backup file"
+)
+@click.option(
+    "-s",
+    "--stdin-mode",
+    is_flag=True,
+    help="Read beancount file data from stdin and output result to stdout",
 )
 @click.option(
     "-l",
@@ -57,32 +65,39 @@ def main(
     filename: typing.List[click.Path],
     backup_suffix: str,
     log_level: str,
+    stdin_mode: bool,
     no_backup: bool,
 ):
     logging.basicConfig(level=LOG_LEVEL_MAP[log_level])
     logger = logging.getLogger(__name__)
     parser = make_parser()
     formatter = Formatter()
-    for name in filename:
-        logger.info("Processing file %s", name)
-        with open(name, "rt") as input_file:
-            input_content = input_file.read()
-            tree = parser.parse(input_content)
-        with tempfile.NamedTemporaryFile(mode="wt+", suffix=".bean") as output_file:
-            formatter.format(tree, output_file)
-            output_file.seek(0)
-            output_content = output_file.read()
-            if input_content == output_content:
-                logger.info("File %s is not changed, skip", name)
-                continue
-            if not no_backup:
-                backup_path = create_backup(
-                    src=pathlib.Path(str(name)), suffix=backup_suffix
-                )
-                logger.info("File %s changed, backup to %s", name, backup_path)
-            output_file.seek(0)
-            with open(name, "wt") as input_file:
-                shutil.copyfileobj(output_file, input_file)
+    if stdin_mode:
+        logger.info("Processing in stdin mode")
+        input_content = sys.stdin.read()
+        tree = parser.parse(input_content)
+        formatter.format(tree, sys.stdout)
+    else:
+        for name in filename:
+            logger.info("Processing file %s", name)
+            with open(name, "rt") as input_file:
+                input_content = input_file.read()
+                tree = parser.parse(input_content)
+            with tempfile.NamedTemporaryFile(mode="wt+", suffix=".bean") as output_file:
+                formatter.format(tree, output_file)
+                output_file.seek(0)
+                output_content = output_file.read()
+                if input_content == output_content:
+                    logger.info("File %s is not changed, skip", name)
+                    continue
+                if not no_backup:
+                    backup_path = create_backup(
+                        src=pathlib.Path(str(name)), suffix=backup_suffix
+                    )
+                    logger.info("File %s changed, backup to %s", name, backup_path)
+                output_file.seek(0)
+                with open(name, "wt") as input_file:
+                    shutil.copyfileobj(output_file, input_file)
     logger.info("done")
 
 
