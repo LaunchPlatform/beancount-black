@@ -41,19 +41,29 @@ def test_create_backup_with_conflicts(tmp_path: pathlib.Path):
         ("number_expr.bean", "number_expr.bean"),
     ],
 )
+@pytest.mark.parametrize("stdin_mode", [False, True])
 def test_main(
     tmp_path: pathlib.Path,
     fixtures_folder: pathlib.Path,
     input_file: pathlib.Path,
     expected_output_file: pathlib.Path,
+    stdin_mode: bool,
 ):
     input_file_path = fixtures_folder / "input" / input_file
     expected_output_file_path = fixtures_folder / "expected_output" / input_file
     tmp_input_file = tmp_path / "input.bean"
     shutil.copy2(input_file_path, tmp_input_file)
     runner = CliRunner()
-    result = runner.invoke(main, [str(tmp_input_file)], catch_exceptions=False)
+    if stdin_mode:
+        result = runner.invoke(
+            main, ["-s", "-"], input=tmp_input_file.read_text(), catch_exceptions=False
+        )
+    else:
+        result = runner.invoke(main, [str(tmp_input_file)], catch_exceptions=False)
     assert result.exit_code == 0
-    updated_input_content = tmp_input_file.read_text()
+    if stdin_mode:
+        updated_input_content = result.stdout
+    else:
+        updated_input_content = tmp_input_file.read_text()
     expected_output_content = expected_output_file_path.read_text()
     assert updated_input_content == expected_output_content
