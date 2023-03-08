@@ -68,6 +68,14 @@ output_file = io.StringIO()
 formatter.format(tree, output_file)
 ```
 
+## Stdin mode
+
+You can run the formatter in STDIN mode by passing `-s` or `--stdin-mode` argument like this:
+
+```bash
+bean-black -s
+```
+
 ## Debug
 
 Sometimes you might encounter problems when formatting some beancount files.
