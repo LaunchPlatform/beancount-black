@@ -1,0 +1,9 @@
+2000-01-01 open Assets:Cash
+2000-01-01 open Expenses:Food
+
+;; comment OK
+2010-01-01 txn "P. Escobar" "White flour"
+  Assets:Cash                                         1,000.00 USD
+  Expenses:Food
+
+;; this comment blows up

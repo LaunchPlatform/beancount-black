@@ -518,17 +518,6 @@ class Formatter:
                 else:
                     raise ValueError(f"Unexpected token {first_child.type}")
             else:
-                if comments and comments[-1].line + 1 != statement.meta.line:
-                    # Standalone comment group
-                    entry = Entry(
-                        type=EntryType.COMMENTS,
-                        comments=comments,
-                        statement=statement,
-                        metadata=[],
-                        postings=[],
-                    )
-                    entries.append(entry)
-                    comments = []
                 if first_child.data == "posting":
                     last_entry = entries[-1]
                     if last_entry.type != EntryType.TXN:
@@ -558,8 +547,9 @@ class Formatter:
                 entries.append(entry)
                 comments = []
 
+        tailing_comments_entry: typing.Optional[Entry] = None
         if comments:
-            entry = Entry(
+            tailing_comments_entry = Entry(
                 type=EntryType.COMMENTS,
                 comments=comments,
                 # TODO: maybe pass None makes more sense here?
@@ -567,9 +557,6 @@ class Formatter:
                 metadata=[],
                 postings=[],
             )
-            entries.append(entry)
-            comments = []
-            # TODO: or add to tail comments?
 
         # breaking down entries into groups by leading entry type, comments or
         # None (means doesn't belong to the leading groups or comments)
@@ -597,6 +584,10 @@ class Formatter:
         remain_entries.sort(key=self.get_entry_sorting_key)
         for entry in remain_entries:
             sections.append(self.format_entry(entry))
+
+        # Dealing with the special case when there's tailing comments in the file
+        if tailing_comments_entry is not None:
+            sections.append(self.format_entry(tailing_comments_entry))
 
         return "\n\n".join(sections)
 
