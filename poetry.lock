@@ -2,14 +2,14 @@
 
 [[package]]
 name = "beancount-parser"
-version = "0.1.24"
+version = "0.2.0"
 description = "Standalone Lark based Beancount syntax parser (not relying on Beancount library), MIT license"
 category = "main"
 optional = false
 python-versions = ">=3.9,<4.0"
 files = [
-    {file = "beancount-parser-0.1.24.tar.gz", hash = "sha256:669889c6965d05f2c9894e8a8fe65321ec3fb25bc3fc8569560a4e137925068d"},
-    {file = "beancount_parser-0.1.24-py3-none-any.whl", hash = "sha256:44fc36b50b8e8c55bdf84c40d0af5040c44a52d9c68f210286a470907f423c39"},
+    {file = "beancount_parser-0.2.0-py3-none-any.whl", hash = "sha256:9f5895cfde5d631d0335f09ccd88edef450701d4ff4a06ecc02d48c5e1932c38"},
+    {file = "beancount_parser-0.2.0.tar.gz", hash = "sha256:acf5a02ad807a3b8c5385761569919e886cceb59e89d0173d648fe3a87280082"},
 ]
 
 [package.dependencies]
@@ -152,4 +152,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "68cb2fae558a8b1d9252ee5f73306753b2c6f2c2f5af6a246fae45976b9e5387"
+content-hash = "861907bf3dae1bbcad0512accb0f82e893150c16781c9c117b680467c2e97cf3"
