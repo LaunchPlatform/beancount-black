@@ -143,7 +143,7 @@ def test_format_date_directive(
 ):
     parser = make_parser()
     root = parser.parse(text)
-    date_directive = root.children[0]
+    date_directive = root.children[0].children[0]
     if column_widths is not None:
         for key, value in column_widths.items():
             setattr(formatter, key, value)
