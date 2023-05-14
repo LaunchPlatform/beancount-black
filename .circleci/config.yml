@@ -8,7 +8,7 @@ orbs:
 jobs:
   test:
     docker:
-      - image: cimg/python:3.10.2
+      - image: cimg/python:3.10.11
     steps:
       - checkout
       - python/install-packages:
@@ -18,7 +18,7 @@ jobs:
           command: poetry run python -m pytest ./tests -svvvv
   build-and-publish:
     docker:
-      - image: cimg/python:3.10.2
+      - image: cimg/python:3.10.11
     steps:
       - checkout
       - python/install-packages:
