@@ -1,0 +1,6 @@
+- id: beancount-black
+  description: beancount-black
+  name: beancount-black
+  entry: bean-black -n
+  language: python
+  files: \.(beancount|bean)$
