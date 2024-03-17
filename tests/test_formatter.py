@@ -194,13 +194,26 @@ def test_format_price(formatter: Formatter, tree: Tree, expected_result: str):
     [
         (
             Tree(
-                "per_unit_cost",
+                "cost_spec",
                 [
                     Tree(
-                        "amount",
+                        "cost_item",
                         [
-                            Tree("number_expr", [Token("NUMBER", "1234.56")]),
-                            Token("CURRENCY", "USD"),
+                            Tree(
+                                "amount",
+                                [
+                                    Tree(
+                                        "number_expr",
+                                        [
+                                            Token(
+                                                "NUMBER",
+                                                "1,234.56",
+                                            )
+                                        ],
+                                    ),
+                                    Token("CURRENCY", "USD"),
+                                ],
+                            )
                         ],
                     )
                 ],
@@ -240,19 +253,123 @@ def test_format_price(formatter: Formatter, tree: Tree, expected_result: str):
         ),
         (
             Tree(
-                "dated_cost",
+                "cost_spec",
                 [
                     Tree(
-                        "amount",
+                        "cost_item",
                         [
-                            Tree("number_expr", [Token("NUMBER", "1234.56")]),
-                            Token("CURRENCY", "USD"),
+                            Tree(
+                                "amount",
+                                [
+                                    Tree(
+                                        "number_expr",
+                                        [
+                                            Token(
+                                                "NUMBER",
+                                                "1,234.56",
+                                            )
+                                        ],
+                                    ),
+                                    Token("CURRENCY", "USD"),
+                                ],
+                            )
                         ],
                     ),
-                    Token("DATE", "2022-04-01"),
+                    Tree(
+                        "cost_item",
+                        [Token("DATE", "2022-04-01")],
+                    ),
                 ],
             ),
             "{1,234.56 USD, 2022-04-01}",
+        ),
+        (
+            Tree(
+                "cost_spec",
+                [
+                    Tree(
+                        "cost_item",
+                        [
+                            Tree(
+                                "amount",
+                                [
+                                    Tree(
+                                        "number_expr",
+                                        [
+                                            Token(
+                                                "NUMBER",
+                                                "1,234.56",
+                                            )
+                                        ],
+                                    ),
+                                    Token("CURRENCY", "USD"),
+                                ],
+                            )
+                        ],
+                    ),
+                    Tree(
+                        "cost_item",
+                        [Token("DATE", "2022-04-01")],
+                    ),
+                    Tree(
+                        "cost_item",
+                        [Token("ESCAPED_STRING", '"my-label"')],
+                    ),
+                ],
+            ),
+            '{1,234.56 USD, 2022-04-01, "my-label"}',
+        ),
+        (
+            Tree(
+                "cost_spec",
+                [
+                    Tree(
+                        "cost_item",
+                        [
+                            Tree(
+                                "amount",
+                                [
+                                    Tree(
+                                        "number_expr",
+                                        [
+                                            Token(
+                                                "NUMBER",
+                                                "1,234.56",
+                                            )
+                                        ],
+                                    ),
+                                    Token("CURRENCY", "USD"),
+                                ],
+                            )
+                        ],
+                    ),
+                    Tree(
+                        "cost_item",
+                        [Token("DATE", "2022-04-01")],
+                    ),
+                    Tree(
+                        "cost_item",
+                        [Token("ESCAPED_STRING", '"my-label"')],
+                    ),
+                    Tree(
+                        "cost_item",
+                        [Token("ASTERISK", "*")],
+                    ),
+                ],
+            ),
+            '{1,234.56 USD, 2022-04-01, "my-label", *}',
+        ),
+        (
+            Tree(
+                "cost_spec",
+                [
+                    Tree(
+                        "cost_item",
+                        [Token("ASTERISK", "*")],
+                    )
+                ],
+            ),
+            "{*}",
         ),
     ],
 )

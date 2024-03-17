@@ -298,19 +298,36 @@ class Formatter:
             raise ValueError()
         return " ".join([prefix, amount_value])
 
+    def format_cost_item(self, tree: Tree) -> str:
+        if tree.data != "cost_item":
+            raise ValueError("Expected a cost_item")
+        child = tree.children[0]
+        if isinstance(child, Token) and child.type in {
+            "DATE",
+            "ESCAPED_STRING",
+            "ASTERISK",
+        }:
+            return child.value
+        elif child.data == "amount":
+            return " ".join(self.get_amount_columns(child))
+        raise ValueError(f"Unexpected cost item {tree}")
+
     def format_cost(self, tree: Tree) -> str:
-        if tree.data not in {"per_unit_cost", "total_cost", "both_cost", "dated_cost"}:
-            raise ValueError(
-                "Expected a per_unit_cost, total_cost, both_cost or dated_cost"
+        if tree.data in {"per_unit_cost", "dated_cost"}:
+            raise RuntimeError(
+                "You are using an out-dated beancount-parser, version >= 1.0.0 is required"
             )
+        if tree.data not in {"total_cost", "both_cost", "cost_spec"}:
+            raise ValueError("Expected a total_cost, both_cost or cost_spec")
         if tree.data != "total_cost":
             bracket_start = "{"
             bracket_end = "}"
         else:
             bracket_start = "{{"
             bracket_end = "}}"
+        separator = " "
         items: typing.List[str] = []
-        if tree.data in {"per_unit_cost", "total_cost", "dated_cost"}:
+        if tree.data == "total_cost":
             amount = tree.children[0]
             amount_value = " ".join(self.get_amount_columns(amount))
             items.append(amount_value)
@@ -321,11 +338,10 @@ class Formatter:
             items.append(number_value)
             items.append("#")
             items.append(amount_value)
-        elif tree.data == "dated_cost":
-            date = tree.children[1]
-            items[-1] += ","
-            items.append(date.value)
-        return bracket_start + " ".join(items) + bracket_end
+        elif tree.data == "cost_spec":
+            separator = ", "
+            items.extend(map(self.format_cost_item, tree.children))
+        return bracket_start + separator.join(items) + bracket_end
 
     def get_directive_child_columns(
         self, child: typing.Union[Token, Tree]
@@ -560,9 +576,9 @@ class Formatter:
 
         # breaking down entries into groups by leading entry type, comments or
         # None (means doesn't belong to the leading groups or comments)
-        entry_groups: typing.Dict[
-            typing.Optional[EntryType], typing.List[Entry]
-        ] = collections.defaultdict(list)
+        entry_groups: typing.Dict[typing.Optional[EntryType], typing.List[Entry]] = (
+            collections.defaultdict(list)
+        )
         for entry in entries:
             entry_type: typing.Optional[EntryType] = None
             if entry.type in LEADING_ENTRY_TYPES:
