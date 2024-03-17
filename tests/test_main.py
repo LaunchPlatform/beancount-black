@@ -42,6 +42,7 @@ def test_create_backup_with_conflicts(tmp_path: pathlib.Path):
         ("number_expr.bean", "number_expr.bean"),
         ("tailing_comment.bean", "tailing_comment.bean"),
         ("tailing_comments.bean", "tailing_comments.bean"),
+        ("metadata_items.bean", "metadata_items.bean"),
     ],
 )
 @pytest.mark.parametrize("stdin_mode", [False, True])

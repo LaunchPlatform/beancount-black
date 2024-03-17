@@ -375,3 +375,60 @@ def test_format_price(formatter: Formatter, tree: Tree, expected_result: str):
 )
 def test_format_cost(formatter: Formatter, tree: Tree, expected_result: str):
     assert formatter.format_cost(tree) == expected_result
+
+
+@pytest.mark.parametrize(
+    "tree, expected_result",
+    [
+        (
+            Tree(
+                Token("RULE", "metadata_item"),
+                [
+                    Token("METADATA_KEY", "total"),
+                    Tree(Token("RULE", "number_expr"), [Token("NUMBER", "50000")]),
+                ],
+            ),
+            "total: 50,000",
+        ),
+        (
+            Tree(
+                Token("RULE", "metadata_item"),
+                [
+                    Token("METADATA_KEY", "doc"),
+                    Token("ESCAPED_STRING", '"/path/to/my-doc"'),
+                ],
+            ),
+            'doc: "/path/to/my-doc"',
+        ),
+        (
+            Tree(
+                Token("RULE", "metadata_item"),
+                [Token("METADATA_KEY", "account"), Token("ACCOUNT", "Assets:Cash")],
+            ),
+            "account: Assets:Cash",
+        ),
+        (
+            Tree(
+                Token("RULE", "metadata_item"),
+                [Token("METADATA_KEY", "currency"), Token("CURRENCY", "USD")],
+            ),
+            "currency: USD",
+        ),
+        (
+            Tree(
+                Token("RULE", "metadata_item"),
+                [Token("METADATA_KEY", "date"), Token("DATE", "2024-03-16")],
+            ),
+            "date: 2024-03-16",
+        ),
+        (
+            Tree(
+                Token("RULE", "metadata_item"),
+                [Token("METADATA_KEY", "tags"), Token("TAGS", "#tags1 #tags2")],
+            ),
+            "tags: #tags1 #tags2",
+        ),
+    ],
+)
+def test_format_metadata_item(formatter: Formatter, tree: Tree, expected_result: str):
+    assert formatter.format_metadata_item(tree) == expected_result

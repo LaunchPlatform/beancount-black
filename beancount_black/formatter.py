@@ -358,11 +358,33 @@ class Formatter:
             return [self.format_number_expr(tree)]
         raise ValueError(f"Unknown tree type {tree.data}")
 
+    def format_metadata_item_value(
+        self, tree_or_token: typing.Union[Tree, Token]
+    ) -> str:
+        if isinstance(tree_or_token, Token):
+            token: Token = tree_or_token
+            if token.type in {"ESCAPED_STRING", "ACCOUNT", "CURRENCY", "DATE", "TAGS"}:
+                return token.value
+            else:
+                raise ValueError(f"Unknown token type {token.type}")
+        elif isinstance(tree_or_token, Tree):
+            tree: Tree = tree_or_token
+            if tree.data == "number_expr":
+                return self.format_number_expr(tree)
+            elif tree.data == "amount":
+                return " ".join(self.get_amount_columns(tree))
+            else:
+                raise ValueError(f"Unknown tree {tree.data}")
+        else:
+            raise ValueError(f"Unexpected type {type(tree_or_token)}")
+
     def format_metadata_item(self, tree: Tree) -> str:
         if tree.data != "metadata_item":
             raise ValueError("Expected a metadata item")
-        key_token, value_token = tree.children
-        return f"{key_token.value}: {value_token.value}"
+        key_token, value_tree_or_token = tree.children
+        return (
+            f"{key_token.value}: {self.format_metadata_item_value(value_tree_or_token)}"
+        )
 
     def format_simple_directive(self, tree: Tree) -> str:
         if tree.data != "simple_directive":
