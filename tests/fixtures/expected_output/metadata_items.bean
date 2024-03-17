@@ -1,0 +1,7 @@
+2024-03-16 commodity USD
+  doc: "/path/to/my-doc"
+  total: 50,000
+  account: Assets:Cash
+  date: 2024-01-23
+  tags: #tags1  #tags2
+  currency: TWD
