@@ -302,7 +302,11 @@ class Formatter:
         if tree.data != "cost_item":
             raise ValueError("Expected a cost_item")
         child = tree.children[0]
-        if isinstance(child, Token) and child.type in {"DATE", "ESCAPED_STRING"}:
+        if isinstance(child, Token) and child.type in {
+            "DATE",
+            "ESCAPED_STRING",
+            "ASTERISK",
+        }:
             return child.value
         elif child.data == "amount":
             return " ".join(self.get_amount_columns(child))
