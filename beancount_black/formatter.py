@@ -285,6 +285,17 @@ class Formatter:
         number, currency = tree.children
         return [self.format_number_expr(number), currency.value]
 
+    def get_amount_tolerance_columns(self, tree: Tree) -> typing.List[str]:
+        if tree.data != "amount_tolerance":
+            raise ValueError("Expected a amount")
+        number, tolerance, currency = tree.children
+        return [
+            self.format_number_expr(number),
+            "~",
+            self.format_number_expr(tolerance),
+            currency.value,
+        ]
+
     def format_price(self, tree: Tree) -> str:
         if tree.data not in {"per_unit_price", "total_price"}:
             raise ValueError("Expected a per_unit_price or total_price")
@@ -354,6 +365,8 @@ class Formatter:
             return [",".join(currency.value for currency in tree.children)]
         elif tree.data == "amount":
             return self.get_amount_columns(tree)
+        elif tree.data == "amount_tolerance":
+            return self.get_amount_tolerance_columns(tree)
         elif tree.data == "number_expr":
             return [self.format_number_expr(tree)]
         raise ValueError(f"Unknown tree type {tree.data}")

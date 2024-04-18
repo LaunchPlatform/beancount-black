@@ -133,6 +133,11 @@ def test_format_number_expr(formatter: Formatter, tree: Tree, expected_result: s
             "1970-01-01  balance     Assets:Bank  12.34    USD",
             "1970-01-01 balance Assets:Bank               12.34 USD",
         ),
+        (
+            dict(account_width=20, number_width=10),
+            "1970-01-01  balance     Assets:Bank  12.34 ~ 0.015   USD",
+            "1970-01-01 balance Assets:Bank               12.34 ~ 0.015 USD",
+        ),
     ],
 )
 def test_format_date_directive(
