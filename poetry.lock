@@ -2,13 +2,13 @@
 
 [[package]]
 name = "beancount-parser"
-version = "1.0.0"
+version = "1.0.1"
 description = "Standalone Lark based Beancount syntax parser (not relying on Beancount library), MIT license"
 optional = false
-python-versions = ">=3.9,<4.0"
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "beancount_parser-1.0.0-py3-none-any.whl", hash = "sha256:b2c67883d8cabf729d991b62ff4994ba5ccf6a90d5aadfa385cdf0d41ef38896"},
-    {file = "beancount_parser-1.0.0.tar.gz", hash = "sha256:bcbe45796231975e7d6a20c1503aeb12b164c6d9f14d7bb32f5e9718d69f8be5"},
+    {file = "beancount_parser-1.0.1-py3-none-any.whl", hash = "sha256:aa83bebd2165f816192b63aea7b010670663528781294956c75d6bc7ee6d288f"},
+    {file = "beancount_parser-1.0.1.tar.gz", hash = "sha256:13cd9a9900636c20d76de6ea43e4a40da30b8adb0aa4e7e41913d7d7a3d4d109"},
 ]
 
 [package.dependencies]
@@ -41,13 +41,13 @@ files = [
 
 [[package]]
 name = "exceptiongroup"
-version = "1.2.0"
+version = "1.2.1"
 description = "Backport of PEP 654 (exception groups)"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "exceptiongroup-1.2.0-py3-none-any.whl", hash = "sha256:4bfd3996ac73b41e9b9628b04e079f193850720ea5945fc96a08633c66912f14"},
-    {file = "exceptiongroup-1.2.0.tar.gz", hash = "sha256:91f5c769735f051a4290d52edd0858999b57e5876e9f85937691bd4c9fa3ed68"},
+    {file = "exceptiongroup-1.2.1-py3-none-any.whl", hash = "sha256:5258b9ed329c5bbdd31a309f53cbfb0b155341807f6ff7606a1e801a891b29ad"},
+    {file = "exceptiongroup-1.2.1.tar.gz", hash = "sha256:a4785e48b045528f5bfe627b6ad554ff32def154f42372786903b7abcfe1aa16"},
 ]
 
 [package.extras]
@@ -94,13 +94,13 @@ files = [
 
 [[package]]
 name = "pluggy"
-version = "1.4.0"
+version = "1.5.0"
 description = "plugin and hook calling mechanisms for python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pluggy-1.4.0-py3-none-any.whl", hash = "sha256:7db9f7b503d67d1c5b95f59773ebb58a8c1c288129a88665838012cfb07b8981"},
-    {file = "pluggy-1.4.0.tar.gz", hash = "sha256:8c85c2876142a764e5b7548e7d9a0e0ddb46f5185161049a79b7e974454223be"},
+    {file = "pluggy-1.5.0-py3-none-any.whl", hash = "sha256:44e1ad92c8ca002de6377e165f3e0f1be63266ab4d554740532335b9d75ea669"},
+    {file = "pluggy-1.5.0.tar.gz", hash = "sha256:2cffa88e94fdc978c4c574f15f9e59b7f4201d439195c3715ca9e2486f1d0cf1"},
 ]
 
 [package.extras]
@@ -143,4 +143,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "4f9aaadb560b92b9b860a9e51595554c656372781b967b4b0c8bb2e2a8e64711"
+content-hash = "5d644db1ac150a39b426b77997a060c9e8156e305aa2e4ad73c48b099af3bc9c"
