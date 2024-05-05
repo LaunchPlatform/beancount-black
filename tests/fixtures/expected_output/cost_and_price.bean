@@ -8,3 +8,4 @@
   Assets:Cash                                              1.0 BTC {12,345 USD, 2022-03-01, "my-label"}
   Assets:Cash                                              1.0 BTC {12,345 USD, 2022-03-01, "my-label", *}
   Assets:Cash                                              1.0 BTC {*}
+  Assets:Cash                                              1.0 BTC {}
