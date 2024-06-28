@@ -1,5 +1,5 @@
 # beancount-black [![CircleCI](https://circleci.com/gh/LaunchPlatform/beancount-black/tree/master.svg?style=svg)](https://circleci.com/gh/LaunchPlatform/beancount-black/tree/master)
-Opinionated code formatter, just like Python's [black](https://pypi.org/project/black/) code formatter but for Beancount
+Opinionated Beancount formatter library, just like Python's [black](https://pypi.org/project/black/) code formatter but for Beancount
 
 Try it out online [here](https://app.beanhub.io/tools/beancount-formatter)
 
@@ -27,6 +27,13 @@ While SaaS businesses won't be required to open-source an internal tool like thi
 It would be greatly beneficial for the community to access a tool like this, so we've decided to open-source it under an MIT license. We hope you find this tool useful 😄
 
 ## Install
+
+> [!WARNING]  
+> Bean-black is deprecated and will remain as is, with no feature updates.
+> It's subject to removal in future versions.
+> In the future, the `beancount-black` package will focus on serving as a Beancount formatter library.
+> Please use [beanhub-cli](https://github.com/LaunchPlatform/beanhub-cli) instead if you need a formatter command-line tool.
+> Newer features like file traversal, account, or commodity renaming will only be available with `beanhub-cli`.
 
 To install the formatter, simply run
 
