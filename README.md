@@ -29,7 +29,7 @@ It would be greatly beneficial for the community to access a tool like this, so 
 ## Install
 
 > [!WARNING]  
-> Bean-black is deprecated and will remain as is, with no feature updates.
+> Bean-black command-line is deprecated and will remain as is, with no feature updates.
 > It's subject to removal in future versions.
 > In the future, the `beancount-black` package will focus on serving as a Beancount formatter library.
 > Please use [beanhub-cli](https://github.com/LaunchPlatform/beanhub-cli) instead if you need a formatter command-line tool.
