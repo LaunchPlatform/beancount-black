@@ -69,6 +69,13 @@ def main(
 ):
     logging.basicConfig(level=LOG_LEVEL_MAP[log_level])
     logger = logging.getLogger(__name__)
+    logger.warning(
+        "Bean-black is deprecated and will remain as is, with no feature updates. "
+        "It's subject to removal in future versions. "
+        "In the future, the beancount-black package will focus on serving as a Beancount formatter library. "
+        "Please use beanhub-cli (https://github.com/LaunchPlatform/beanhub-cli) instead if you need a formatter command-line tool. "
+        "Newer features like file traversal, account, or commodity renaming will only be available with beanhub-cli."
+    )
     parser = make_parser()
     formatter = Formatter()
     if stdin_mode:
