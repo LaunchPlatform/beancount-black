@@ -118,6 +118,39 @@ def parse_date(date_str: str) -> datetime.date:
     return datetime.date(*(map(int, parts)))
 
 
+def extract_txn_sorting_details(tree: Tree) -> tuple:
+    if tree.data != "statement":
+        raise ValueError("Expected statement")
+    first_child = tree.children[0]
+    if first_child.data != "date_directive":
+        raise ValueError("Expected date_directive")
+    first_child = first_child.children[0]
+    if first_child.data != "txn":
+        raise ValueError("Expected txn")
+    _, payee, narration, annotations = first_child.children[1:]
+    sorting_keys = []
+    if payee is not None:
+        sorting_keys.append(payee.value)
+    else:
+        sorting_keys.append("")
+    if narration is not None:
+        sorting_keys.append(narration.value)
+    else:
+        sorting_keys.append("")
+    if annotations is not None:
+        annotation_values = [annotation.value for annotation in annotations.children]
+        links = list(filter(lambda v: v.startswith("^"), annotation_values))
+        links.sort()
+        hashes = list(filter(lambda v: v.startswith("#"), annotation_values))
+        hashes.sort()
+        sorting_keys.append(" ".join(links))
+        sorting_keys.append(" ".join(hashes))
+    else:
+        sorting_keys.append("")
+        sorting_keys.append("")
+    return tuple(sorting_keys)
+
+
 class Collector:
     def __init__(self, logger: typing.Optional[logging.Logger] = None):
         super().__init__()
@@ -192,7 +225,11 @@ class Formatter:
         first_child = entry.statement.children[0]
         if first_child.data == "date_directive":
             date = parse_date(first_child.children[0].children[0].value)
-            return (date, entry.statement.meta.line)
+            if entry.type == EntryType.TXN:
+                details = extract_txn_sorting_details(entry.statement)
+            else:
+                details = ()
+            return (date, details, entry.statement.meta.line)
         elif first_child.data == "simple_directive":
             # all simple directive child should be token, so just return them as tuple
             return tuple(
