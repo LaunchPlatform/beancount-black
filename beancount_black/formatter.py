@@ -216,7 +216,7 @@ class Formatter:
             raise ValueError("Expected a NUMBER")
         value = token.value.replace(",", "")
         number = decimal.Decimal(value)
-        return f"{number:,}"
+        return f"{number:,f}"
 
     def format_number_atom(self, tree_or_token: typing.Union[Tree, Token]) -> str:
         if isinstance(tree_or_token, Token):

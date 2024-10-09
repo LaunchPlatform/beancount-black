@@ -142,7 +142,7 @@ def test_format_number_expr(formatter: Formatter, tree: Tree, expected_result: s
         (
             dict(account_width=20, number_width=10),
             "1970-01-01  balance     Assets:Bank  0.00000001    USD",
-            "1970-01-01 balance Assets:Bank            0.00000001 USD",
+            "1970-01-01 balance Assets:Bank          0.00000001 USD",
         ),
     ],
 )
