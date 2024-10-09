@@ -94,6 +94,7 @@ def test_format_comment(formatter: Formatter, value: str, expected_result: str):
             "+123.4567",
         ),
         (Tree("number_expr", [Token("NUMBER", value="1234567.90")]), "1,234,567.90"),
+        (Tree("number_expr", [Token("NUMBER", value="0.00000001")]), "0.00000001"),
     ],
 )
 def test_format_number_expr(formatter: Formatter, tree: Tree, expected_result: str):
