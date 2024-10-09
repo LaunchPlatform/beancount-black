@@ -1,6 +1,8 @@
 2022-04-01
   Assets:Cash                                             20.0 USD @ 12,345.67 TWD
   Assets:Cash                                             20.0 USD @@ 12,345.67 TWD
+  Assets:Cash                                       0.00000001 BTC {12,345 USD}
+  Assets:Cash                                              1.0 BTC {0.00000001 USD}
   Assets:Cash                                              1.0 BTC {12,345 USD}
   Assets:Cash                                              1.0 BTC {{12,345 USD}}
   Assets:Cash                                              1.0 BTC {12,345 # 6,789 USD}

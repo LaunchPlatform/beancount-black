@@ -1,4 +1,5 @@
 2022-04-10 txn "payee" "Narration"
+  Assets:Bank                                                      0.00000001 USD
   Assets:Bank                                                 (12.34 + 56.78) USD
   Assets:Bank                                                 (12.34 - 56.78) USD
   Assets:Bank                                                 (12.34 * 56.78) USD
