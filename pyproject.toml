@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "beancount-black"
-version = "1.0.4"
+version = "1.0.5"
 description = "Opinioned beancount formatter library"
 authors = ["Fang-Pen Lin <fangpen@launchplatform.com>"]
 license = "MIT"
