@@ -8,7 +8,7 @@ Try it out online [here](https://app.beanhub.io/tools/beancount-formatter)
 > It's subject to removal in future versions.
 > In the future, the `beancount-black` package will focus on serving as a Beancount formatter library.
 > Please use [beanhub-cli](https://github.com/LaunchPlatform/beanhub-cli) instead if you need a formatter command-line tool.
-> Newer features like file traversal, account, or commodity renaming are only be available with `beanhub-cli`.
+> Newer features like file [traversal](https://beanhub-cli-docs.beanhub.io/commands/format/), [account, or commodity renaming](https://beanhub-cli-docs.beanhub.io/commands/format/#rename-account-and-currency-commodity) are only be available with `beanhub-cli`.
 
 ## Features
 
