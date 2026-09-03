@@ -184,6 +184,8 @@ class Formatter:
         logger: typing.Optional[logging.Logger] = None,
     ):
         self.indent_width = indent_width
+        self.min_account_width = min_account_width
+        self.min_number_width = min_number_width
         self.account_width = min_account_width
         self.number_width = min_number_width
         self.logger = logger or logging.getLogger(__name__)
@@ -678,6 +680,10 @@ class Formatter:
     def format(self, tree: ParseTree, output_file: io.TextIOBase):
         if tree.data != "start":
             raise ValueError("expected start as the root rule")
+        # Column widths are per file. Reusing a Formatter must not leak the
+        # longest account/number from a previous tree into this one.
+        self.account_width = self.min_account_width
+        self.number_width = self.min_number_width
         self.calculate_column_widths(tree)
 
         collector = Collector()

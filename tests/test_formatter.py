@@ -1,4 +1,5 @@
 import typing
+from io import StringIO
 
 import pytest
 from beancount_parser.parser import make_parser
@@ -443,3 +444,49 @@ def test_format_cost(formatter: Formatter, tree: Tree, expected_result: str):
 )
 def test_format_metadata_item(formatter: Formatter, tree: Tree, expected_result: str):
     assert formatter.format_metadata_item(tree) == expected_result
+
+
+def _format_source(source: str, formatter: typing.Optional[Formatter] = None) -> str:
+    parser = make_parser()
+    buf = StringIO()
+    (formatter if formatter is not None else Formatter()).format(
+        parser.parse(source), buf
+    )
+    return buf.getvalue()
+
+
+def test_format_resets_column_widths_between_files():
+    wide = (
+        '2020-01-01 * "Wide"\n'
+        "  Assets:Bank:US:Fidelity:Individual:Brokerage  10.00 USD\n"
+        "  Expenses:Fees\n"
+    )
+    narrow = '2020-01-01 * "Narrow"\n' "  Assets:Cash  1.00 USD\n" "  Expenses:Food\n"
+    formatter = Formatter()
+    _format_source(wide, formatter)
+    reused = _format_source(narrow, formatter)
+    fresh = _format_source(narrow)
+    assert reused == fresh
+    assert "Assets:Cash" in reused
+    # A leaked width from `wide` would insert extra pad before 1.00.
+    wide_then_narrow_if_shared = _format_source(
+        narrow,
+        Formatter(
+            min_account_width=len("Assets:Bank:US:Fidelity:Individual:Brokerage")
+        ),
+    )
+    assert reused != wide_then_narrow_if_shared
+
+
+def test_format_column_width_uses_only_the_current_file():
+    source = (
+        '2020-01-01 * "Buy"\n'
+        "  Assets:US:Vanguard:RothIRA2024:VTSAX  10.00 USD\n"
+        "  Assets:US:Cash\n"
+    )
+    formatted = _format_source(source)
+    posting = next(line for line in formatted.splitlines() if "VTSAX" in line)
+    # Default account width is 30; this account is longer, so the file's own
+    # max sets the column. A second file must not be required.
+    assert "10.00 USD" in posting
+
