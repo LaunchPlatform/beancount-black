@@ -77,12 +77,11 @@ def main(
         "Newer features like file traversal, account, or commodity renaming will only be available with beanhub-cli."
     )
     parser = make_parser()
-    formatter = Formatter()
     if stdin_mode:
         logger.info("Processing in stdin mode")
         input_content = sys.stdin.read()
         tree = parser.parse(input_content)
-        formatter.format(tree, sys.stdout)
+        Formatter().format(tree, sys.stdout)
     else:
         for name in filename:
             logger.info("Processing file %s", name)
@@ -90,7 +89,8 @@ def main(
                 input_content = input_file.read()
                 tree = parser.parse(input_content)
             with tempfile.NamedTemporaryFile(mode="wt+", suffix=".bean") as output_file:
-                formatter.format(tree, output_file)
+                # One Formatter per file so account/number columns stay local.
+                Formatter().format(tree, output_file)
                 output_file.seek(0)
                 output_content = output_file.read()
                 if input_content == output_content:
