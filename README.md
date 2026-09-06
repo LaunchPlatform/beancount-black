@@ -112,3 +112,10 @@ The available log level options are:
  
 Feedbacks, bugs reporting or feature requests are welcome 🙌, just please open an issue.
 No guarantee we have time to deal with them, but will see what we can do.
+
+## Branch protection test
+
+These lines were added by a Cursor Cloud Agent on 2026-09-06 to verify GitHub PR create + merge against `master`.
+
+- test-line-1: agent can open a pull request
+- test-line-2: agent can merge that pull request
